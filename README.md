@@ -39,5 +39,10 @@ To classify an image:
 
     python classify.py /path/to/image
 
-    
+To retrain the inceptionV3 network, set the params correctly in retrain.py and then
 
+    python retrain.py
+    
+This will print out a lot, including a confusion matrix at the end
+
+You can then run `./scripts/tensorboard` (make sure the script is pointed to your log dir correctly though) to see some of the results in tensorboard
