@@ -1,0 +1,5 @@
+#!/bin/bash
+for f in *.JPG
+do
+	echo $f,`file $f | grep -Po "[0-9]{4}:[0-9]{2}:[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}" | head -1` | sed 's/ /,/g'
+done
