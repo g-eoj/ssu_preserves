@@ -90,11 +90,11 @@ FLAGS = tf.app.flags.FLAGS
 # Input and output file flags.
 tf.app.flags.DEFINE_string('image_dir', './images/ssu/Camera3Faraway/public/',
                            """Path to folders of labeled images.""")
-tf.app.flags.DEFINE_string('output_graph', 'tmp/output_graph.pb',
+tf.app.flags.DEFINE_string('output_graph', '~/tmp/output_graph.pb',
                            """Where to save the trained graph.""")
-tf.app.flags.DEFINE_string('output_labels', 'tmp/output_labels.txt',
+tf.app.flags.DEFINE_string('output_labels', '~/tmp/output_labels.txt',
                            """Where to save the trained graph's labels.""")
-tf.app.flags.DEFINE_string('summaries_dir', 'tmp/retrain_logs',
+tf.app.flags.DEFINE_string('summaries_dir', '~/tmp/retrain_logs',
                           """Where to save summary logs for TensorBoard.""")
 
 # Details of the training configuration.
@@ -123,12 +123,12 @@ tf.app.flags.DEFINE_integer(
     """ how accurate the model is during training.""")
 
 # File-system cache locations.
-tf.app.flags.DEFINE_string('model_dir', 'tmp/imagenet',
+tf.app.flags.DEFINE_string('model_dir', '~/tmp/imagenet',
                            """Path to classify_image_graph_def.pb, """
                            """imagenet_synset_to_human_label_map.txt, and """
                            """imagenet_2012_challenge_label_map_proto.pbtxt.""")
 tf.app.flags.DEFINE_string(
-    'bottleneck_dir', 'tmp/bottleneck',
+    'bottleneck_dir', '~/tmp/bottleneck',
     """Path to cache bottleneck layer values as files.""")
 tf.app.flags.DEFINE_string('final_tensor_name', 'final_result',
                            """The name of the output classification layer in"""
@@ -803,6 +803,7 @@ def add_confusion_matrix_step(result_tensor, ground_truth_input):
   with tf.name_scope('accuracy'):
     with tf.name_scope('confusion_matrix'):
       confusion = tf.contrib.metrics.confusion_matrix(tf.argmax(result_tensor, 1), tf.argmax(ground_truth_input, 1))
+      #print(tf.argmax(ground_truth_input, 1))
       #tf.image_summary('confusion matrix', confusion)
   return confusion
 
@@ -930,7 +931,10 @@ def main(_):
     confusion_step,
     feed_dict={bottleneck_input: test_bottlenecks,
                ground_truth_input: test_ground_truth})
+
+  #print(test_ground_truth)
   print(confusion);
+  print(image_lists.keys());
 
   #tf.contrib.metrics.confusion_matrix(predictions, labels)
 
