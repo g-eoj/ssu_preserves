@@ -31,3 +31,13 @@ If you need a different version of TensorFlow check the [list of builds.](https:
 
 ### Usage... wip
 
+Activate the conda environment:
+
+    source activate tf
+
+To classify an image: 
+
+    python classify.py /path/to/image
+
+    
+
