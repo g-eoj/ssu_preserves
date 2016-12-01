@@ -1,6 +1,11 @@
 import tensorflow as tf
 import sys
 
+# location of the labels used in the retrained model
+labels = "./retrained_models/ImageNetOnly/output_labels.txt"
+# location of the graph for the retrained model
+model = "./retrained_models/ImageNetOnly/output_graph.pb"
+
 # change this as you see fit
 image_path = sys.argv[1]
 
@@ -8,10 +13,10 @@ image_path = sys.argv[1]
 image_data = tf.gfile.FastGFile(image_path, 'rb').read()
 
 # Loads label file for the retrained model, strips off carriage return
-label_lines = [line.rstrip() for line in tf.gfile.GFile("./tmp/output_labels.txt")]
+label_lines = [line.rstrip() for line in tf.gfile.GFile(labels)]
 
 # Unpersists graph from file
-with tf.gfile.FastGFile("./tmp/output_graph.pb", 'rb') as f:
+with tf.gfile.FastGFile(model, 'rb') as f:
     graph_def = tf.GraphDef()
     graph_def.ParseFromString(f.read())
     _ = tf.import_graph_def(graph_def, name='')
