@@ -50,7 +50,9 @@ The retrained model files will be saved as "tmp/output_graph.pb" and "tmp/output
 
 To classify an image: 
 
+Put the retrained model files in the "retrained_models" folder.
+The path to the model files can be changed in the classify.py script by changing the "labels" and "model" variables. 
+
     python classify.py /path/to/image
 
 This will print out the top-5 predictions for the specified model.
-The model can be changed in the classify.py script by changing the "labels" and "model" variables. 
