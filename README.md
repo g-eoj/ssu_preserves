@@ -45,6 +45,8 @@ Finally run the line below, on the first run it will download the Inception-v3 m
 
 This will print out a lot, including a confusion matrix at the end
 You can then run `./scripts/tensorboard` (make sure the script is pointed to your log dir correctly though) to see some of the results in tensorboard.
+`retrain.py` will create a log directory based on the paramaters supplied at the top of the file. Currently those params are set to `./tmp/<outputs>` for various `<outputs>`.
+`./scripts/tensorboard` will simply run `tensorboard` in the current directory with `./tmp/` as the log directory.
 The retrained model files will be saved as "tmp/output_graph.pb" and "tmp/output_labels.txt"
 
 
