@@ -15,7 +15,7 @@ Activate the environment:
 Install packages:
 
     conda install scikit-learn
-    # conda install jupyter matplotlib (not needed currently)
+    conda install matplotlib
 
 Install TensorFlow on Mac:
  
@@ -52,5 +52,15 @@ To classify an image:
 
     python classify.py /path/to/image
 
-This will print out the top-5 predictions for the specified model.
+This will assign the image a score for each class the model knows about and display the image with matplotib:
+
+    $ python classify.py images/deer/EK000052.JPG
+    W tensorflow/core/framework/op_def_util.cc:332] Op BatchNormWithGlobalNormalization is deprecated. It will cease to work in GraphDef version 9. Use tf.nn.batch_normalization().
+    deer (score = 0.99342)
+    squirrel (score = 0.00253)
+    nothing (score = 0.00154)
+    possum (score = 0.00133)
+    turkey (score = 0.00092)
+    skunk (score = 0.00026)
+
 The model can be changed in the classify.py script by changing the "labels" and "model" variables. 
