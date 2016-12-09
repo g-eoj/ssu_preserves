@@ -1,10 +1,11 @@
-import tensorflow as tf
+import pylab
 import sys
+import tensorflow as tf
 
 # location of the labels used in the retrained model
-labels = "./retrained_models/ImageNetOnly/output_labels.txt"
+labels = "./tmp/output_labels.txt"
 # location of the graph for the retrained model
-model = "./retrained_models/ImageNetOnly/output_graph.pb"
+model = "./tmp/output_graph.pb"
 
 # change this as you see fit
 image_path = sys.argv[1]
@@ -35,3 +36,8 @@ with tf.Session() as sess:
         human_string = label_lines[node_id]
         score = predictions[0][node_id]
         print('%s (score = %.5f)' % (human_string, score))
+
+# display the image
+img=pylab.imread(image_path)
+pylab.imshow(img)
+pylab.show()

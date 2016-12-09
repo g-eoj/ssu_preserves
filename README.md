@@ -15,7 +15,7 @@ Activate the environment:
 Install packages:
 
     conda install scikit-learn
-    # conda install jupyter matplotlib (not needed currently)
+    conda install matplotlib
 
 Install TensorFlow on Mac:
  
@@ -34,7 +34,7 @@ Activate the conda environment:
     source activate tf
 
 
-To do transfer learning with the Inception-v3 model:
+#### Transfer learning with the Inception-v3 model:
 
 To retrain the inceptionV3 network, set the params correctly in retrain.py.
 Put the training images in folders named with the image class label. 
@@ -54,11 +54,21 @@ You can then run `./scripts/tensorboard` (make sure the script is pointed to you
 The retrained model files will be saved as "tmp/output_graph.pb" and "tmp/output_labels.txt"
 
 
-To classify an image: 
+#### Classify an image with a retrained model: 
 
-Put the retrained model files in the "retrained_models" folder.
-The path to the model files can be changed in the classify.py script by changing the "labels" and "model" variables. 
+Assuming a retrained model is available, to classify an image run:
 
     python classify.py /path/to/image
 
-This will print out the top-5 predictions for the specified model.
+This will assign the image a score for each class the model knows about and display the image with matplotib:
+
+    $ python classify.py images/deer/EK000052.JPG
+    W tensorflow/core/framework/op_def_util.cc:332] Op BatchNormWithGlobalNormalization is deprecated. It will cease to work in GraphDef version 9. Use tf.nn.batch_normalization().
+    deer (score = 0.99342)
+    squirrel (score = 0.00253)
+    nothing (score = 0.00154)
+    possum (score = 0.00133)
+    turkey (score = 0.00092)
+    skunk (score = 0.00026)
+
+The model used for classification can be changed in the classify.py script by changing the "labels" and "model" variables. 
