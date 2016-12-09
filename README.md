@@ -15,11 +15,7 @@ Activate the environment:
 Install packages:
 
     conda install scikit-learn
-<<<<<<< HEAD
     conda install matplotlib
-=======
-    # conda install jupyter matplotlib (not needed currently)
->>>>>>> master
 
 Install TensorFlow on Mac:
  
@@ -38,7 +34,7 @@ Activate the conda environment:
     source activate tf
 
 
-To do transfer learning with the Inception-v3 model:
+#### Transfer learning with the Inception-v3 model:
 
 To retrain the inceptionV3 network, set the params correctly in retrain.py.
 Put the training images in folders named with the image class label. 
@@ -47,12 +43,20 @@ Finally run the line below, on the first run it will download the Inception-v3 m
 
     python retrain.py
 
-This will print out a lot, including a confusion matrix at the end
+This will print out a lot, including a confusion matrix at the end.
+
 You can then run `./scripts/tensorboard` (make sure the script is pointed to your log dir correctly though) to see some of the results in tensorboard.
+
+`retrain.py` will create a log directory based on the paramaters supplied at the top of the file. Currently those params are set to `./tmp/<outputs>` for various `<outputs>`.
+
+`./scripts/tensorboard` will simply run `tensorboard` in the current directory with `./tmp/` as the log directory.
+
 The retrained model files will be saved as "tmp/output_graph.pb" and "tmp/output_labels.txt"
 
 
-To classify an image: 
+#### Classify an image with a retrained model: 
+
+Assuming a retrained model is available, to classify an image run:
 
     python classify.py /path/to/image
 
@@ -67,4 +71,4 @@ This will assign the image a score for each class the model knows about and disp
     turkey (score = 0.00092)
     skunk (score = 0.00026)
 
-The model can be changed in the classify.py script by changing the "labels" and "model" variables. 
+The model used for classification can be changed in the classify.py script by changing the "labels" and "model" variables. 
