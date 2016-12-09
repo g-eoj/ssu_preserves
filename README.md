@@ -2,7 +2,7 @@
 
 ### Setup
 
-Install [miniconda](http://conda.pydata.org/miniconda.html)
+Install [miniconda](http://conda.pydata.org/miniconda.html).
 
 Create a conda environment:
 
@@ -36,14 +36,55 @@ Activate the conda environment:
 
 #### Transfer learning with the Inception-v3 model:
 
-To retrain the inceptionV3 network, set the params correctly in retrain.py.
 Put the training images in folders named with the image class label. 
-Then put these folders in the folder "training_images".
+Each class needs at least 20 images.
+Then put these folders in the folder "training_images" so the directory structure looks something like:
+
+    ssu_preserves    
+    └── training_images
+        ├── bobcat
+        ├── deer
+        ├── human
+        ├── nothing
+        ├── possum
+        ├── skunk
+        ├── squirrel
+        └── turkey
+
 Finally run the line below, on the first run it will download the Inception-v3 model:
 
     python retrain.py
 
-This will print out a lot, including a confusion matrix at the end.
+Before the model starts retraining it needs to create 'bottlenecks' for each image. 
+'bottlenecks' are cached so subsequent runs will not do this. 
+Every run the images are randomly split into three groups: 90% training, 10% validation, 10% testing.
+
+While the model is retraining it will print periodic updates: 
+
+    2016-12-07 00:21:09.566693: Step 19000: Train accuracy = 100.0%
+    2016-12-07 00:21:09.566764: Step 19000: Cross entropy = 0.059450
+    2016-12-07 00:21:09.591180: Step 19000: Validation accuracy = 90.0%
+
+Generally you want 'Validation accuracy' to stay similar to 'Train accuray' and 'Cross entropy' to have a decreasing trend (allowing for some noise). 
+If this isn't happening try changing one or more of the following parameters in retrain.py: 'test_batch_size' or 'learning_rate'. 
+
+If 'Cross entropy' is still decreasing when retraining ends you may want to increase the value of 'how_many_training_steps'.
+
+When it's done retraining, images from the testing group are used to get final accuracy and a confusion matrix, which are printed along with a parameter summary:
+
+    Final test accuracy = 96.2%
+    [[16  0  0  0  0  1]
+     [ 0  9  1  1  0  0]
+     [ 0  0 14  0  0  0]
+     [ 0  0  0 12  0  0]
+     [ 0  0  0  0 15  0]
+     [ 0  0  0  0  0 11]]
+    dict_keys(['squirrel', 'possum', 'deer', 'nothing', 'skunk', 'turkey'])
+    Training Steps: 20000
+    Learning Rate: 0.001
+    Train Batch Size: 20
+    Validation Batch Size: 20
+    Test Batch Size: 100
 
 You can then run `./scripts/tensorboard` (make sure the script is pointed to your log dir correctly though) to see some of the results in tensorboard.
 
