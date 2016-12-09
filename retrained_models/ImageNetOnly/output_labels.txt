@@ -1,7 +1,0 @@
-squirrel
-rabbit
-deer
-bobcat
-turkey
-possum
-rat

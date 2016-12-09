@@ -15,7 +15,11 @@ Activate the environment:
 Install packages:
 
     conda install scikit-learn
+<<<<<<< HEAD
     conda install matplotlib
+=======
+    # conda install jupyter matplotlib (not needed currently)
+>>>>>>> master
 
 Install TensorFlow on Mac:
  
