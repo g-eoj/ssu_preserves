@@ -98,9 +98,9 @@ tf.app.flags.DEFINE_string('summaries_dir', './tmp/retrain_logs',
                           """Where to save summary logs for TensorBoard.""")
 
 # Details of the training configuration.
-tf.app.flags.DEFINE_integer('how_many_training_steps', 200,
+tf.app.flags.DEFINE_integer('how_many_training_steps', 20000,
                             """How many training steps to run before ending.""")
-tf.app.flags.DEFINE_float('learning_rate', 0.01,
+tf.app.flags.DEFINE_float('learning_rate', 0.001,
                           """How large a learning rate to use when training.""")
 tf.app.flags.DEFINE_integer(
     'testing_percentage', 10,
@@ -108,16 +108,16 @@ tf.app.flags.DEFINE_integer(
 tf.app.flags.DEFINE_integer(
     'validation_percentage', 10,
     """What percentage of images to use as a validation set.""")
-tf.app.flags.DEFINE_integer('eval_step_interval', 10,
+tf.app.flags.DEFINE_integer('eval_step_interval', 100,
                             """How often to evaluate the training results.""")
-tf.app.flags.DEFINE_integer('train_batch_size', 100,
+tf.app.flags.DEFINE_integer('train_batch_size', 20,
                             """How many images to train on at a time.""")
-tf.app.flags.DEFINE_integer('test_batch_size', 500,
+tf.app.flags.DEFINE_integer('test_batch_size', 100,
                             """How many images to test on at a time. This"""
                             """ test set is only used infrequently to verify"""
                             """ the overall accuracy of the model.""")
 tf.app.flags.DEFINE_integer(
-    'validation_batch_size', 100,
+    'validation_batch_size', 20,
     """How many images to use in an evaluation batch. This validation set is"""
     """ used much more often than the test set, and is an early indicator of"""
     """ how accurate the model is during training.""")
@@ -935,6 +935,11 @@ def main(_):
   #print(test_ground_truth)
   print(confusion);
   print(image_lists.keys());
+  print("Training Steps:", FLAGS.how_many_training_steps)
+  print("Learning Rate:", FLAGS.learning_rate)
+  print("Train Batch Size:", FLAGS.train_batch_size)
+  print("Validation Batch Size:", FLAGS.validation_batch_size)
+  print("Test Batch Size:", FLAGS.test_batch_size)
 
   #tf.contrib.metrics.confusion_matrix(predictions, labels)
 
