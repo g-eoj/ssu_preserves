@@ -116,7 +116,7 @@ The model used for classification can be changed in the classify.py script by ch
 
 ### Running a test on a directory of images
 Set up the flags at the top of ClassifyDirectory.py.
-With a directory of images set up in a similar manner as that required for `retrain.py`, ie`
+With a directory of images set up in a similar manner as that required for `retrain.py`, eg
 ```
     image_dir
     ├── aaanone
