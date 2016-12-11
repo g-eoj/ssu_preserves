@@ -9,18 +9,9 @@ labels = "./tmp/output_labels.txt"
 # location of the graph for the retrained model
 model = "./tmp/output_graph.pb"
 
-def classify(image_path):
+def classify(image_path, graph_def, label_lines):
     # Read in the image_data
     image_data = tf.gfile.FastGFile(image_path, 'rb').read()
-
-    # Loads label file for the retrained model, strips off carriage return
-    label_lines = [line.rstrip() for line in tf.gfile.GFile(labels)]
-
-    # Unpersists graph from file
-    with tf.gfile.FastGFile(model, 'rb') as f:
-        graph_def = tf.GraphDef()
-        graph_def.ParseFromString(f.read())
-        _ = tf.import_graph_def(graph_def, name='')
 
     with tf.Session() as sess:
         # Feed the image_data as input to the graph and get first prediction
@@ -39,13 +30,19 @@ def classify(image_path):
             result.append((human_string, score))
             #print('%s (score = %.5f)' % (human_string, score))
 
-    sess.close()
-
     return result 
-
 
 # change this as you see fit
 folder_path = sys.argv[1]
+
+# Loads label file for the retrained model, strips off carriage return
+label_lines = [line.rstrip() for line in tf.gfile.GFile(labels)]
+
+# Unpersists graph from file
+with tf.gfile.FastGFile(model, 'rb') as f:
+    graph_def = tf.GraphDef()
+    graph_def.ParseFromString(f.read())
+    _ = tf.import_graph_def(graph_def, name='')
 
 print("getting filename list...")
 filenames = os.listdir(folder_path)
@@ -57,7 +54,7 @@ while index < len(filenames):
         index += 1
         if filename.endswith(".JPG"):
             image_path = folder_path + filename
-            result = classify(image_path)
+            result = classify(image_path, graph_def, label_lines)
             # top 1
             if result[0][0] == 'turkey':
                 correct += 1
