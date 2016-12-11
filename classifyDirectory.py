@@ -35,12 +35,12 @@ FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('image_dir', '/home/student/cburke/cam4sample',
                            """Path to folders of labeled images.""")
 tf.app.flags.DEFINE_string('output_graph', './tmp/output_graph.pb',
-                           """Where to save the trained graph.""")
+                           """Where is the trained graph saved?""")
 tf.app.flags.DEFINE_string('output_labels', './tmp/output_labels.txt',
-                           """Where to save the trained graph's labels.""")
+                           """Where are the labels for the trained graph?""")
 tf.app.flags.DEFINE_string('final_tensor_name', 'final_result',
                            """The name of the output classification layer in"""
-                           """ the retrained graph.""")
+                           """ the trained graph.""")
 tf.app.flags.DEFINE_string('summaries_dir', './tmp/testingLogs',
                           """Where to save summary logs for TensorBoard.""")
 
@@ -70,7 +70,7 @@ def create_graph(class_count):
     manipulating.
   """
   with tf.Session() as sess:
-    model_filename = './tmp/output_graph.pb'
+    model_filename = FLAGS.output_graph
     with gfile.FastGFile(model_filename, 'rb') as f:
       graph_def = tf.GraphDef()
       graph_def.ParseFromString(f.read())
