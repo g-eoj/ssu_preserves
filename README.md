@@ -113,3 +113,19 @@ This will assign the image a score for each class the model knows about and disp
     skunk (score = 0.00026)
 
 The model used for classification can be changed in the classify.py script by changing the "labels" and "model" variables. 
+
+### Running a test on a directory of images
+Set up the flags at the top of ClassifyDirectory.py.
+With a directory of images set up in a similar manner as that required for `retrain.py`, eg
+```
+    image_dir
+    ├── aaanone
+    ├── animal
+    ├── deer
+    └── squirrel
+```
+Run the script `ClassifyDirectory.py`.
+This will classify all images in the directory and check them against their labels. The folder names MUST be the same as the folder names used when retraining the network (with `retrain.py`). They also should be all lower-case.
+The script will eventually quit and display something like
+![conf_mat](example_confmat.png)
+The above confidence matrix was obtained by running a network trained on Cam3 images on a directory consisting exclusively of Cam4 images.
