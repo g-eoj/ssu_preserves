@@ -21,8 +21,12 @@ from tensorflow.python.framework import tensor_shape
 from tensorflow.python.platform import gfile
 from tensorflow.python.util import compat
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import roc_curve, auc
+from scipy import interp
 import matplotlib.pyplot as plt
+from itertools import cycle
 import itertools
+
 
 
 import struct
@@ -149,7 +153,7 @@ def get_image_and_ground_truth(class_names):
 		imageClass = class_names[index];
 		where = os.path.join(FLAGS.image_dir, imageClass);
 		image_list = create_image_list(where);
-		for i in image_list:
+		for i in image_list: #this stuff is no longer really necessary
 			full_image.append(os.path.join(where, i));
 			temp = np.zeros(len(class_names), dtype=np.float32);
 			temp[index] = 1.0;
@@ -226,6 +230,65 @@ def plot_confusion_matrix(cm, classes,
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+    
+
+def getROC(predictions, labels, class_list):
+	# Compute ROC curve and ROC area for each class
+	fpr = dict()
+	tpr = dict()
+	roc_auc = dict()
+	for i in range(len(class_list)):
+		fpr[i], tpr[i], _ = roc_curve(predictions, labels, i)
+		roc_auc[i] = auc(fpr[i], tpr[i])
+	return (fpr, tpr, roc_auc)
+    
+    
+"""
+multi-class ROC from
+http://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html
+"""
+def multiClassROC(fpr, tpr, roc_auc, class_list):
+	n_classes = len(class_list);
+	lw = 2; #line width
+	# Compute macro-average ROC curve and ROC area
+
+	# First aggregate all false positive rates
+	all_fpr = np.unique(np.concatenate([fpr[i] for i in range(n_classes)]))
+
+	# Then interpolate all ROC curves at this points
+	mean_tpr = np.zeros_like(all_fpr)
+	for i in range(n_classes):
+		mean_tpr += interp(all_fpr, fpr[i], tpr[i])
+
+	# Finally average it and compute AUC
+	mean_tpr /= n_classes
+
+	fpr["macro"] = all_fpr
+	tpr["macro"] = mean_tpr
+	roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
+
+	# Plot all ROC curves
+	plt.figure()
+
+	plt.plot(fpr["macro"], tpr["macro"],
+		     label='macro-average ROC curve (area = {0:0.2f})'
+		           ''.format(roc_auc["macro"]),
+		     color='navy', linestyle=':', linewidth=4)
+
+	colors = cycle(['aqua', 'darkorange', 'cornflowerblue', 'green', 'red'])
+	for i, color in zip(range(n_classes), colors):
+		plt.plot(fpr[i], tpr[i], color=color, lw=lw,
+		         label='ROC curve of class {0} (area = {1:0.2f})'
+		         ''.format(class_list[i], roc_auc[i]))
+
+	plt.plot([0, 1], [0, 1], 'k--', lw=lw)
+	plt.xlim([0.0, 1.0])
+	plt.ylim([0.0, 1.05])
+	plt.xlabel('False Positive Rate')
+	plt.ylabel('True Positive Rate')
+	plt.title('ROC plot')
+	plt.legend(loc="lower right")
+	plt.show()
 
 
 def writeOutLogs():
@@ -251,6 +314,8 @@ def main(_):
 		#now get the truth from the ground_truth_tensor
 		truth_op = tf.argmax(ground_truth_tensor, 1);
 		truth = sess.run(truth_op, feed_dict={ground_truth_tensor: ground_truth});
+		fpr, tpr, roc_auc = getROC(prediction_list, truth, class_list);
+		multiClassROC(fpr, tpr, roc_auc, class_list)
 		print ("predictions", prediction_list);
 		print ("truth      ", truth);
 		eq = np.equal(prediction_list, truth)
