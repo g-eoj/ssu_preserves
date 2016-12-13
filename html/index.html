@@ -128,6 +128,11 @@ table td img {
 
 #contents a {
 }
+
+.row-images *{
+    display: inline;
+}
+
 </style>
 <script type="text/javascript">
     hljs.initHighlightingOnLoad();
@@ -136,25 +141,45 @@ table td img {
 <body>
 <div id="header" >
 <div id="headersub">
-<h1>Your team Name <span style="color: #DE3737">(names of team members)</span></h1>
+<h1>T-Rex Cinnamon Club <span style="color: #DE3737">Burke, Granados, Ward</span></h1>
 </div>
 </div>
 <div class="container">
 
-<h2>CS 385 : Your project/report title here</h2>
+<h2>CS 385 : Image Classification with retrained convolutional neural networks</h2>
 
-<div style="float: right; padding: 20px">
-<img src="placeholder.jpg" />
-<p style="font-size: 14px">Example of a right floating element.</p>
+<h3>Introduction</h3>
+
+<div style="padding: 20px">
+<img style="max-width: 100%" src="images/inceptionv3.png" />
+<p style="font-size: 14px">The inception v3 network, from https://research.googleblog.com/2016/03/train-your-own-image-classifier-with.html.</p>
 </div>
 
-<p> 	Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<div style="float: right; padding: 20px">
+<img style="max-width: 100%" src="images/conv_layers.png" />
+<p style="font-size: 14px">CNN's use <em>volumes</em> of neurons (image from Wikipedia).</p>
+</div>
 
-<ol>
-<li>list element 1.</li>
-<li>list element 2.</li>
-<li>etc.</li>
-</ol>
+<p> Convolutional neural networks are a type of neural network architecture inspired by biological image processing systems. They consist of very long chains of operators with many parameters, which are tuned during a process called "learning".</p>
+
+<p> Typically training an entire convolutional neural network can take weeks and require a lot of computational power. But there is a way around this; a network that has already been trained to recognize images can be modified to recognize different sets of images.</p>
+
+<p> The TensorFlow library developed at Google and now open-sourced does these types of computations, and several API's exist in different languages. With TensorFlow, we can use the InceptionV3 network (pictured above), which was trained for image recognition contests for datasets consisting of as many as 1000 classes. This network can be retrained through a process known as "transfer learning". Transfer learning enables us to remove the final layer of the network and retrain it to recognize images from our dataset. We manually classified images and then used a modified example script to retran the network successfully.</p>
+
+<h3>Results: Classifying images from one camera after training on the other</h3>
+
+<p> The inceptionV3 network was retrained using data from SSU preserves Camera4, and subsequently tested on images from Camera3. The resulting accuracy was 0.641182466871 . Below is the confidence matrix and ROC curve for this run</p>
+
+<div class="row-images">
+    <div style="display: inline; padding: 20px">
+    <img style="max-width: 40%" src="images/confmatCam4ToCam3.png" />
+    </div>
+    <div style="display: inline; padding: 20px">
+    <img style="max-width: 40%" src="images/ROCCam3ToCam4.png" />
+    </div>
+</div>
+
+<p> This was less than ideal because the training set contained fewer images than the test set. Also, the classifier may have been learning from features that were unique to that specific camera location rather than being more general.</p>
 
 <p> 	Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
