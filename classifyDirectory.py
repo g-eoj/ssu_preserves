@@ -151,7 +151,7 @@ def getClassNames():
     class_names = []
     with open(FLAGS.output_labels, 'rb') as f:
         for line in f:
-            class_names.append(line.rstrip())
+            class_names.append(str(line.rstrip()))
     return class_names
 
 
