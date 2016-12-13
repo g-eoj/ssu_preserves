@@ -124,8 +124,6 @@ With a directory of images set up in a similar manner as that required for `retr
     ├── deer
     └── squirrel
 ```
-Run the script `ClassifyDirectory.py`.
+Run the script `ClassifyDirectory.py` by typing `python ClassifyDirectory.py`.
 This will classify all images in the directory and check them against their labels. The folder names MUST be the same as the folder names used when retraining the network (with `retrain.py`). They also should be all lower-case.
-The script will eventually quit and display something like
-![conf_mat](example_confmat.png)
-The above confidence matrix was obtained by running a network trained on Cam3 images on a directory consisting exclusively of Cam4 images.
+Misclassified images will be output to the directory specified in the flags at the top of the file. Bottlenecks will be created and stored in a file called `bottlenecks.p` in the same directory as the test images. The script will also produce `ROC.png` and `confusion_matrix.png`, rendered images of ROC curves and a confidence matrix.
