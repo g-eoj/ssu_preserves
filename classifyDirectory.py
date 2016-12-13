@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 from __future__ import absolute_import
 from __future__ import division
@@ -151,7 +150,7 @@ def getClassNames():
     class_names = []
     with open(FLAGS.output_labels, 'rb') as f:
         for line in f:
-            class_names.append(str(line.rstrip()))
+            class_names.append(str(line.rstrip(),'utf-8'))
     return class_names
 
 
@@ -388,11 +387,11 @@ def getOrGenerateBottlenecks(
     jpeg_data_tensor,
     ):
     if not gfile.Exists(os.path.join(FLAGS.image_dir, 'bottlenecks.p')):
-        print('bottleneck file not exists! generating...')
+        print('bottleneck file does not exist! generating...')
         dictionary = generateAndPickleBottlenecks(simpleClassList,
                 image_list, bottleneck_tensor, jpeg_data_tensor)
     else:
-        print('bottleneck file does exists!')
+        print('bottleneck file does exist! reading...')
         dictionary = pickle.load(open(os.path.join(FLAGS.image_dir,
                                  'bottlenecks.p'), 'rb'))
 
