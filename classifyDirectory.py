@@ -12,6 +12,7 @@ import random
 import re
 import sys
 import tarfile
+import shutil
 
 import numpy as np
 from six.moves import urllib
@@ -52,6 +53,9 @@ tf.app.flags.DEFINE_string('final_tensor_name', 'final_result',
 tf.app.flags.DEFINE_string('summaries_dir', './tmp/testingLogs',
                            """Where to save summary logs for TensorBoard."""
                            )
+tf.app.flags.DEFINE_string('misclassified_dir', './misclassified_images',
+                           """Where to save summary logs for TensorBoard."""
+                           )                           
 
 # These are all parameters that are tied to the particular model architecture
 # we're using for Inception v3. These include things like tensor names and their
@@ -444,6 +448,7 @@ def withBottlenecks():
             prediction_list.append(prediction)
         prediction_list = np.squeeze(prediction_list)
         processResults(prediction_list, simpleClassList, class_list)
+        copyErrorImages(image_list, prediction_list, simpleClassList, class_list)
 
 
 def processResults(prediction_list, truth, class_list):
@@ -465,6 +470,19 @@ def processResults(prediction_list, truth, class_list):
                           title='Normalized confusion matrix')
     plt.savefig('confusion_matrix.png')
 
+def copyErrorImages(filenames, predictions, truth, class_names):
+    count = 0
+    for i in range(len(filenames)):
+        predicted = predictions[i]
+        shouldBe = truth[i]
+        if(predicted != shouldBe):
+            count = count + 1
+            base = os.path.basename(filenames[i])
+            newFile = base + "p." + class_names[predicted] + ".t." + class_names[shouldBe] + ".png"
+            where = os.path.join(FLAGS.misclassified_dir, newFile);
+            #print("moving "+filenames[i]+" to "+where);
+            shutil.copyfile(filenames[i], where)
+            #print (str(count) + " missclassified images!");
 
 def somethingOrOther():
     class_list = getClassNames()
