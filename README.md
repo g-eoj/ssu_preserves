@@ -66,7 +66,7 @@ While the model is retraining it will print periodic updates:
     2016-12-07 00:21:09.591180: Step 19000: Validation accuracy = 90.0%
 
 Generally you want 'Validation accuracy' to stay similar to 'Train accuray' and 'Cross entropy' to have a decreasing trend (allowing for some noise). 
-If this isn't happening try changing one or more of the following parameters in retrain.py: 'test_batch_size' or 'learning_rate'. 
+If this isn't happening try changing one or more of the following parameters in retrain.py: 'train_batch_size' or 'learning_rate'. 
 
 If 'Cross entropy' is still decreasing when retraining ends you may want to increase the value of 'how_many_training_steps'.
 
