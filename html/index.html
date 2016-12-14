@@ -124,6 +124,7 @@ a {
 pre {
 	font-family: 'Droid Sans Mono';
 	font-size: 14px;
+    margin-top: -4px;
 }
 
 table td {
@@ -193,11 +194,11 @@ Identify animals and detect whether an animal is present in images from the SSU 
 
 <h3>Retraining</h3>
 <p>
-Our retraining script randomly splits images into three groups:
+The retraining script randomly splits images into three groups:
 <ul>
-    <li>Train: used for training the network</li>
-    <li>Validation: used to check the progress of training</li>
-    <li>Test: used to get accuracy after training is complete</li>
+    <li>Train (80%): used for training the network</li>
+    <li>Validation (10%): used to check the progress of training</li>
+    <li>Test (10%): used to get accuracy after training is complete</li>
 </ul>
 </p>
 
