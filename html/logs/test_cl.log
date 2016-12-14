@@ -1,0 +1,41 @@
+classifying bobcat jpgs...
+bobcat (score = 0.90323) | filename: Cam4_EK001777.JPG
+bobcat (score = 0.97049) | filename: Cam4_EK001628.JPG
+bobcat (score = 0.96417) | filename: Cam4_EK001772.JPG
+bobcat (score = 0.97117) | filename: Cam4_EK001755.JPG
+classifying deer jpgs...
+deer (score = 0.54869) | filename: Cam3_EK001339.JPG
+deer (score = 0.97606) | filename: Cam3_EK001373.JPG
+deer (score = 0.46348) | filename: Cam3_EK001246.JPG
+deer (score = 0.99913) | filename: Cam3_EK000922.JPG
+classifying human jpgs...
+nothing (score = 0.45844) | filename: Cam4_EK001896.JPG
+human (score = 0.99223) | filename: Cam4_EK001604.JPG
+human (score = 0.99960) | filename: Cam4_EK001898.JPG
+human (score = 0.99994) | filename: Cam4_EK001800.JPG
+classifying nothing jpgs...
+nothing (score = 0.86411) | filename: Cam3_EK001338.JPG
+nothing (score = 0.83326) | filename: Cam4_EK001969.JPG
+nothing (score = 0.81573) | filename: Cam4_EK001286.JPG
+nothing (score = 0.84001) | filename: Cam3_EK001329.JPG
+classifying possum jpgs...
+possum (score = 0.94055) | filename: Cam3_EK000014.JPG
+possum (score = 0.88395) | filename: Cam3_EK000010.JPG
+possum (score = 0.88492) | filename: Cam3_EK000015.JPG
+possum (score = 0.88005) | filename: Cam3_EK000152.JPG
+classifying skunk jpgs...
+skunk (score = 0.97238) | filename: Cam4_EK001408.JPG
+skunk (score = 0.99187) | filename: Cam4_EK001635.JPG
+skunk (score = 0.99227) | filename: Cam3_EK000589.JPG
+skunk (score = 0.93318) | filename: Cam4_EK001813.JPG
+classifying squirrel jpgs...
+nothing (score = 0.50551) | filename: Cam4_EK001537.JPG
+squirrel (score = 0.99578) | filename: Cam4_EK001612.JPG
+squirrel (score = 0.97543) | filename: Cam3_EK000494.JPG
+nothing (score = 0.51035) | filename: Cam4_EK001506.JPG
+classifying turkey jpgs...
+turkey (score = 0.99341) | filename: Cam3_EK000034.JPG
+turkey (score = 0.98872) | filename: Cam3_EK001264.JPG
+turkey (score = 0.99458) | filename: Cam3_EK001495.JPG
+turkey (score = 0.99482) | filename: Cam3_EK001497.JPG
+Accuracy: 0.90625

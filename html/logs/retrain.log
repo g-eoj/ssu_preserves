@@ -1,0 +1,15 @@
+test accuracy = 94.0%
+[[14  0  0  0  1  0  0  0]
+ [ 0 13  0  0  0  0  0  0]
+ [ 0  0 10  0  0  0  0  0]
+ [ 0  0  0 12  0  1  2  0]
+ [ 0  0  0  0  9  0  0  0]
+ [ 0  0  0  0  0 11  0  1]
+ [ 0  0  0  0  0  0 14  0]
+ [ 0  0  0  1  0  0  0 11]]
+dict_keys(['possum', 'turkey', 'bobcat', 'nothing', 'deer', 'skunk', 'human', 'squirrel'])
+Training Steps: 20000
+Learning Rate: 0.001
+Train Batch Size: 20
+Validation Batch Size: 20
+Test Batch Size: 100

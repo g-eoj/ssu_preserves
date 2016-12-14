@@ -29,7 +29,7 @@ h2 {
 	font-family: 'Nunito', sans-serif;
 	font-weight: normal;
 	font-size: 32px;
-	margin: 15px 0px 35px 0px;
+	margin: 35px 0px 35px 0px;
 	color: #333;	
 	word-spacing: 3px;
 }
@@ -38,7 +38,7 @@ h3 {
 	font-family: 'Nunito', sans-serif;
 	font-weight: normal;
 	font-size: 26px;
-	margin: 10px 0px 10px 0px;
+	margin: 10px 0px 8px 0px;
 	color: #333;
 	word-spacing: 2px;
 }
@@ -46,7 +46,7 @@ h4 {
 	font-family: 'Nunito', sans-serif;
 	font-weight: normal;
 	font-size: 22px;
-	margin: 10px 0px 10px 0px;
+	margin: 10px 0px 8px 0px;
 	color: #333;
 	word-spacing: 2px;
 }
@@ -55,13 +55,23 @@ h5 {
 	font-family: 'Nunito', sans-serif;
 	font-weight: normal;
 	font-size: 18px;
-	margin: 10px 0px 10px 0px;
+	margin: 10px 0px 8px 0px;
 	color: #111;
 	word-spacing: 2px;
 }
 
-p, li {
+p {
 	color: #444;
+	margin-top: 8px;
+}
+
+ul {
+    margin-top: -12px;
+}
+
+li {
+	color: #444;
+	margin: 4px 0 4px 0;
 }
 
 a {
@@ -80,7 +90,7 @@ a {
 
 #headersub {
 	color: #ccc;
-	width: 960px;
+	width: 1160px;
 	margin: 0px auto 0px auto;
 	padding: 20px 0px 20px 0px;
 }
@@ -141,30 +151,87 @@ table td img {
 <body>
 <div id="header" >
 <div id="headersub">
-<h1>T-Rex Cinnamon Club <span style="color: #DE3737">Burke, Granados, Ward</span></h1>
+<h1>T-Rex Cinnamon Club <span style="color: #8FBC8F">Burke, Granados, Ward</span></h1>
 </div>
 </div>
 <div class="container">
 
-<h2>CS 385 : Image Classification with retrained convolutional neural networks</h2>
+<h2>CS 385 : Image Classification with Retrained Convolutional Neural Networks</h2>
 
-<h3>Introduction</h3>
+<h3>Project Goal</h3>
+<p>
+Identify animals and detect whether an animal is present in images from the SSU Preserves data set using retrained convolutional neural networks.
+</p>
 
+<h3>Data Set</h3>
+<p>The SSU Perserves data set consists of two folders of images from motion sensing cameras. One folder is labeled Camera3Faraway and contains ~3500 images. The other is labeled Camera4Trail and contains ~8300 images. The images came unlabeled so we built a tool to help us manually label them. Some images were unusable because it was unclear what type of animal they contained or because the animal appeared too rarely. For this report we were able to label ~1000 images from Camera3 and ~600 images from Camera4 making a final data set consisting of ~1600 usable images.
+</p>
+
+<h3>Convolutional Neural Networks & Transfer Learning</h3>
 <div style="padding: 20px">
 <img style="max-width: 100%" src="images/inceptionv3.png" />
-<p style="font-size: 14px">The inception v3 network, from https://research.googleblog.com/2016/03/train-your-own-image-classifier-with.html.</p>
+<p style="font-size: 14px; text-align: center">The inception v3 network, from https://research.googleblog.com/2016/03/train-your-own-image-classifier-with.html.</p>
 </div>
 
-<div style="float: right; padding: 20px">
-<img style="max-width: 100%" src="images/conv_layers.png" />
-<p style="font-size: 14px">CNN's use <em>volumes</em> of neurons (image from Wikipedia).</p>
+<div style="float: right; padding: 20px; padding-left: 60px; max-width: 40%">
+<img style="max-width: 100%;" src="images/conv_layers.png" />
+<p style="font-size: 14px; text-align: center">CNN's use <em>volumes</em> of neurons (image from Wikipedia).</p>
+<img style="max-width: 100%; padding-top: 30px;" src="images/02_convolution.png" />
+<p style="font-size: 14px; text-align: center">From https://github.com/Hvass-Labs/TensorFlow-Tutorials.</p>
 </div>
 
 <p> Convolutional neural networks are a type of neural network architecture inspired by biological image processing systems. They consist of very long chains of operators with many parameters, which are tuned during a process called "learning".</p>
 
 <p> Typically training an entire convolutional neural network can take weeks and require a lot of computational power. But there is a way around this; a network that has already been trained to recognize images can be modified to recognize different sets of images.</p>
 
-<p> The TensorFlow library developed at Google and now open-sourced does these types of computations, and several API's exist in different languages. With TensorFlow, we can use the InceptionV3 network (pictured above), which was trained for image recognition contests for datasets consisting of as many as 1000 classes. This network can be retrained through a process known as "transfer learning". Transfer learning enables us to remove the final layer of the network and retrain it to recognize images from our dataset. We manually classified images and then used a modified example script to retran the network successfully.</p>
+<p> The TensorFlow library developed at Google and now open-sourced does these types of computations, and several API's exist in different languages. With TensorFlow, we can use the InceptionV3 network (pictured above), which was trained for image recognition contests for datasets consisting of as many as 1000 classes. Training this network on a desktop with 8 NVIDIA Tesla K40s takes about 2 weeks. This network can be retrained through a process known as "transfer learning". Transfer learning enables us to remove the final layer of the network and retrain it to recognize images from our dataset. We used a modified example script to retrain the network successfully.</p>
+
+<div style="padding: 20px">
+<img style="max-width: 100%" src="images/08_transfer_learning_flowchart.png" />
+<p style="font-size: 14px; text-align: center">Transfer learning uses the features identified by the inception v3 network to train a new classifier, from https://github.com/Hvass-Labs/TensorFlow-Tutorials.</p>
+</div>
+
+<h3>Retraining</h3>
+<p>
+Our retraining script randomly splits images into three groups:
+<ul>
+    <li>Train: used for training the network</li>
+    <li>Validation: used to check the progress of training</li>
+    <li>Test: used to get accuracy after training is complete</li>
+</ul>
+</p>
+
+<p>
+While the model is retraining it will print periodic updates:
+<pre><code>2016-12-07 00:21:09.566693: Step 19000: Train accuracy = 100.0%
+2016-12-07 00:21:09.566764: Step 19000: Cross entropy = 0.059450
+2016-12-07 00:21:09.591180: Step 19000: Validation accuracy = 90.0%
+</code></pre>
+Generally you want 'Validation accuracy' to stay similar to 'Train accuracy' and 'Cross entropy' to have a decreasing trend (allowing for some noise). If this isn't happening you try changing the learning rate or the training batch size parameters. If 'Cross entropy' is still decreasing when retraining ends you may want to increase the number of training steps parameter.
+</p>
+
+<p> 
+When it's done retraining, images from the testing group are used to get final accuracy and a confusion matrix, which are printed along with a parameter summary:
+<pre><code>Final test accuracy = 96.2%
+[[16  0  0  0  0  1]
+ [ 0  9  1  1  0  0]
+ [ 0  0 14  0  0  0]
+ [ 0  0  0 12  0  0]
+ [ 0  0  0  0 15  0]
+ [ 0  0  0  0  0 11]]
+dict_keys(['squirrel', 'possum', 'deer', 'nothing', 'skunk', 'turkey'])
+Training Steps: 20000
+Learning Rate: 0.001
+Train Batch Size: 20
+Validation Batch Size: 20
+Test Batch Size: 100
+</code></pre>
+</p>
+
+<h3>Classifying</h3>
+<p>When a neural network makes a classification it returns a score for each class it knows. The class with the highest score is often used as the predicted class, though in some cases you may want to look at the top 3 classes for example. The score could also be used as a measure of certainty though technically it is not.</p>
+
+<h2>Results</h2>
 
 <h3>Results: Classifying images from one camera after training on the other</h3>
 
@@ -194,280 +261,80 @@ table td img {
     </div>
 </div>
 
-
-
-
-
-
-<p> 	Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-
-<div style="clear:both">
-<h3>Example heading</h3>
-
-<p> 	Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-
-<h2>Example of code with highlighting</h2>
-The javascript in the <code>highlighting</code> folder is configured to do syntax highlighting in code blocks such as the one below.<p>
-
-<pre><code>
-%example code
-for i = 1:length(offset)
-    source = imread(sprintf('%s/source_%02d.jpg',data_dir,i));
-    mask   = imread(sprintf('%s/mask_%02d.jpg',data_dir,i));
-    target = imread(sprintf('%s/target_%02d.jpg',data_dir,i));
-
+<h3>Results: Training with all manually classified images</h3>
+<p>After combining manually labeled images from both cameras we get one data set with class frequencies: 
+<ul>
+<li>bobcat 37</li>
+<li>deer 628</li>
+<li>human 143</li>
+<li>nothing 332</li>
+<li>possum 26</li>
+<li>skunk 87</li>
+<li>squirrel 384</li>
+<li>turkey 40</li>
+</ul>
+Each class needs at least 20 images for retraining to complete successfully. As a compromise 4 images from each class were randomly selected for a <strong>test set</strong>. The rest of the images were put in the <strong>training set</strong> and used for retraining. Retraining gave the following accuracy and confusion matrix:
+<pre><code>Final test accuracy = 94.0%
+[[14 0 0 0 1 0 0 0]
+[ 0 13 0 0 0 0 0 0]
+[ 0 0 10 0 0 0 0 0]
+[ 0 0 0 12 0 1 2 0]
+[ 0 0 0 0 9 0 0 0]
+[ 0 0 0 0 0 11 0 1]
+[ 0 0 0 0 0 0 14 0]
+[ 0 0 0 1 0 0 0 11]]
+dict_keys(['possum', 'turkey', 'bobcat', 'nothing', 'deer', 'skunk', 'human', 'squirrel'])
+Training Steps: 20000
+Learning Rate: 0.001
+Train Batch Size: 20
+Validation Batch Size: 20
+Test Batch Size: 100
 </code></pre>
 
-<h3>Results in a table</h3>
+As a final check the retrained model was used to classify the images in the <strong>test set</strong> and got 90.625% accuracy with the following confusion matrix and ROC curves:
+</p>
 
-<table width="500" border=1>
-<tr>
-<td width="10" height="100">
-<img src="placeholder.jpg" width="24%"/>
-<img src="placeholder.jpg"  width="24%"/>
-<img src="placeholder.jpg" width="24%"/>
-<img src="placeholder.jpg" width="24%"/>
-</td>
-</tr>
+<div class="row-images" style="padding-bottom: 20px">
+    <div style="padding: 20px;">
+    <img align=top style="max-width: 40%" src="images/full_set_confusion_matrix.png" />
+    </div>
+    <div style="padding: 20px;">
+    <img align=top style="max-width: 40%" src="images/full_set_ROC.png" />
+    </div>
+</div>
 
-<tr>
-<td width="10" height="100">
-<img src="placeholder.jpg" width="24%"/>
-<img src="placeholder.jpg"  width="24%"/>
-<img src="placeholder.jpg" width="24%"/>
-<img src="placeholder.jpg" width="24%"/>
-</td>
-</tr>
+<h4>Training Set Examples</h4>
+<p>3 images randomly selected from each class.</p>
+<img style="max-width: 100%; padding-bottom: 40px" src="images/train_cor_class.jpg">
 
-</table>
+<h4>Test Set Correct Classification Examples</h4>
+<p>For each class up to 3 correctly classified images were randomly selected after running the test set through the retrained neural network. Most of the scores are high with the major exceptions being a deer whose head can barely be seen (understandable) and a deer grazing in front of the camera. The low score for the deer in front of the camera is odd but the lighting has a blue tint not present in most images.</p>
+<img style="max-width: 100%; padding-bottom: 40px" src="images/test_cor_class.jpg">
 
-<h2>Some figures</h2>
-<center>
-<p>
-Face template HoG visualization for the starter code. This is completely random, but it should actually look like a face once you train a reasonable classifier.
-<p>
-<img src="hog_template.png">
-<p>
-Precision Recall curve for the starter code.
-<p>
-<img src="average_precision.png">
-<p>
-Example of detection on the test set from the starter code.
-<img src="detections_Argentina.jpg.png">
+<h4>Test Set Misclassification Examples</h4>
+<p>All the misclassified images after running the test set through the retrained neural network. The classifier thinks the images contain nothing although the scores are low. The subjects off to the side and fog may cause the classifier to have difficulty.</p>
+<img style="max-width: 100%; padding-bottom: 40px" src="images/test_mis_class.jpg">
 
-</center>
-<p>
-<center>
-Results visualization for poorly performing recognition pipeline.
-<p>
-<img src="confusion_matrix.png">
-<br>
-Accuracy (mean of diagonal of confusion matrix) is 0.261
-<p>
-
-<table border=0 cellpadding=4 cellspacing=1>
-<tr>
-<th>Category name</th>
-<th>Accuracy</th>
-<th colspan=2>Sample training images</th>
-<th colspan=2>Sample true positives</th>
-<th colspan=2>False positives with true label</th>
-<th colspan=2>False negatives with wrong predicted label</th>
-</tr>
-<tr>
-<td>Kitchen</td>
-<td>0.080</td>
-<td bgcolor=LightBlue><img src="thumbnails/Kitchen_image_0161.jpg" width=100 height=75></td>
-<td bgcolor=LightBlue><img src="thumbnails/Kitchen_image_0144.jpg" width=100 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Kitchen_image_0003.jpg" width=100 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Kitchen_image_0097.jpg" width=101 height=75></td>
-<td bgcolor=LightCoral><img src="thumbnails/Industrial_image_0089.jpg" width=112 height=75><br><small>Industrial</small></td>
-<td bgcolor=LightCoral><img src="thumbnails/Forest_image_0083.jpg" width=75 height=75><br><small>Forest</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Kitchen_image_0048.jpg" width=100 height=75><br><small>Highway</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Kitchen_image_0042.jpg" width=57 height=75><br><small>Forest</small></td>
-</tr>
-<tr>
-<td>Store</td>
-<td>0.040</td>
-<td bgcolor=LightBlue><img src="thumbnails/Store_image_0278.jpg" width=103 height=75></td>
-<td bgcolor=LightBlue><img src="thumbnails/Store_image_0221.jpg" width=113 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Store_image_0034.jpg" width=106 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Store_image_0146.jpg" width=100 height=75></td>
-<td bgcolor=LightCoral><img src="thumbnails/Office_image_0112.jpg" width=123 height=75><br><small>Office</small></td>
-<td bgcolor=LightCoral><img src="thumbnails/TallBuilding_image_0131.jpg" width=75 height=75><br><small>TallBuilding</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Store_image_0081.jpg" width=131 height=75><br><small>TallBuilding</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Store_image_0047.jpg" width=111 height=75><br><small>Coast</small></td>
-</tr>
-<tr>
-<td>Bedroom</td>
-<td>0.200</td>
-<td bgcolor=LightBlue><img src="thumbnails/Bedroom_image_0108.jpg" width=113 height=75></td>
-<td bgcolor=LightBlue><img src="thumbnails/Bedroom_image_0172.jpg" width=112 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Bedroom_image_0011.jpg" width=101 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Bedroom_image_0118.jpg" width=114 height=75></td>
-<td bgcolor=LightCoral><img src="thumbnails/InsideCity_image_0131.jpg" width=75 height=75><br><small>InsideCity</small></td>
-<td bgcolor=LightCoral><img src="thumbnails/Store_image_0038.jpg" width=100 height=75><br><small>Store</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Bedroom_image_0117.jpg" width=52 height=75><br><small>OpenCountry</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Bedroom_image_0019.jpg" width=101 height=75><br><small>Mountain</small></td>
-</tr>
-<tr>
-<td>LivingRoom</td>
-<td>0.100</td>
-<td bgcolor=LightBlue><img src="thumbnails/LivingRoom_image_0121.jpg" width=110 height=75></td>
-<td bgcolor=LightBlue><img src="thumbnails/LivingRoom_image_0165.jpg" width=111 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/LivingRoom_image_0114.jpg" width=98 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/LivingRoom_image_0022.jpg" width=100 height=75></td>
-<td bgcolor=LightCoral><img src="thumbnails/Office_image_0120.jpg" width=116 height=75><br><small>Office</small></td>
-<td bgcolor=LightCoral><img src="thumbnails/Kitchen_image_0128.jpg" width=115 height=75><br><small>Kitchen</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/LivingRoom_image_0062.jpg" width=100 height=75><br><small>Bedroom</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/LivingRoom_image_0066.jpg" width=101 height=75><br><small>Office</small></td>
-</tr>
-<tr>
-<td>Office</td>
-<td>0.190</td>
-<td bgcolor=LightBlue><img src="thumbnails/Office_image_0002.jpg" width=110 height=75></td>
-<td bgcolor=LightBlue><img src="thumbnails/Office_image_0056.jpg" width=130 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Office_image_0138.jpg" width=96 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Office_image_0020.jpg" width=105 height=75></td>
-<td bgcolor=LightCoral><img src="thumbnails/Mountain_image_0098.jpg" width=75 height=75><br><small>Mountain</small></td>
-<td bgcolor=LightCoral><img src="thumbnails/Bedroom_image_0157.jpg" width=90 height=75><br><small>Bedroom</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Office_image_0117.jpg" width=98 height=75><br><small>Industrial</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Office_image_0032.jpg" width=120 height=75><br><small>InsideCity</small></td>
-</tr>
-<tr>
-<td>Industrial</td>
-<td>0.130</td>
-<td bgcolor=LightBlue><img src="thumbnails/Industrial_image_0136.jpg" width=100 height=75></td>
-<td bgcolor=LightBlue><img src="thumbnails/Industrial_image_0033.jpg" width=113 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Industrial_image_0079.jpg" width=101 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Industrial_image_0021.jpg" width=100 height=75></td>
-<td bgcolor=LightCoral><img src="thumbnails/LivingRoom_image_0116.jpg" width=51 height=75><br><small>LivingRoom</small></td>
-<td bgcolor=LightCoral><img src="thumbnails/TallBuilding_image_0057.jpg" width=75 height=75><br><small>TallBuilding</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Industrial_image_0108.jpg" width=100 height=75><br><small>InsideCity</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Industrial_image_0068.jpg" width=94 height=75><br><small>Store</small></td>
-</tr>
-<tr>
-<td>Suburb</td>
-<td>0.470</td>
-<td bgcolor=LightBlue><img src="thumbnails/Suburb_image_0144.jpg" width=113 height=75></td>
-<td bgcolor=LightBlue><img src="thumbnails/Suburb_image_0104.jpg" width=113 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Suburb_image_0041.jpg" width=113 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Suburb_image_0175.jpg" width=113 height=75></td>
-<td bgcolor=LightCoral><img src="thumbnails/Coast_image_0051.jpg" width=75 height=75><br><small>Coast</small></td>
-<td bgcolor=LightCoral><img src="thumbnails/InsideCity_image_0085.jpg" width=75 height=75><br><small>InsideCity</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Suburb_image_0070.jpg" width=113 height=75><br><small>Kitchen</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Suburb_image_0149.jpg" width=113 height=75><br><small>Street</small></td>
-</tr>
-<tr>
-<td>InsideCity</td>
-<td>0.030</td>
-<td bgcolor=LightBlue><img src="thumbnails/InsideCity_image_0074.jpg" width=75 height=75></td>
-<td bgcolor=LightBlue><img src="thumbnails/InsideCity_image_0295.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/InsideCity_image_0127.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/InsideCity_image_0044.jpg" width=75 height=75></td>
-<td bgcolor=LightCoral><img src="thumbnails/Suburb_image_0084.jpg" width=113 height=75><br><small>Suburb</small></td>
-<td bgcolor=LightCoral><img src="thumbnails/Coast_image_0085.jpg" width=75 height=75><br><small>Coast</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/InsideCity_image_0056.jpg" width=75 height=75><br><small>TallBuilding</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/InsideCity_image_0055.jpg" width=75 height=75><br><small>Store</small></td>
-</tr>
-<tr>
-<td>TallBuilding</td>
-<td>0.180</td>
-<td bgcolor=LightBlue><img src="thumbnails/TallBuilding_image_0049.jpg" width=75 height=75></td>
-<td bgcolor=LightBlue><img src="thumbnails/TallBuilding_image_0318.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/TallBuilding_image_0077.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/TallBuilding_image_0038.jpg" width=75 height=75></td>
-<td bgcolor=LightCoral><img src="thumbnails/Store_image_0063.jpg" width=57 height=75><br><small>Store</small></td>
-<td bgcolor=LightCoral><img src="thumbnails/Forest_image_0060.jpg" width=75 height=75><br><small>Forest</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/TallBuilding_image_0023.jpg" width=75 height=75><br><small>LivingRoom</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/TallBuilding_image_0036.jpg" width=75 height=75><br><small>Coast</small></td>
-</tr>
-<tr>
-<td>Street</td>
-<td>0.600</td>
-<td bgcolor=LightBlue><img src="thumbnails/Street_image_0197.jpg" width=75 height=75></td>
-<td bgcolor=LightBlue><img src="thumbnails/Street_image_0072.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Street_image_0143.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Street_image_0036.jpg" width=75 height=75></td>
-<td bgcolor=LightCoral><img src="thumbnails/Kitchen_image_0175.jpg" width=100 height=75><br><small>Kitchen</small></td>
-<td bgcolor=LightCoral><img src="thumbnails/Store_image_0074.jpg" width=54 height=75><br><small>Store</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Street_image_0088.jpg" width=75 height=75><br><small>Highway</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Street_image_0046.jpg" width=75 height=75><br><small>Suburb</small></td>
-</tr>
-<tr>
-<td>Highway</td>
-<td>0.750</td>
-<td bgcolor=LightBlue><img src="thumbnails/Highway_image_0209.jpg" width=75 height=75></td>
-<td bgcolor=LightBlue><img src="thumbnails/Highway_image_0054.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Highway_image_0144.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Highway_image_0078.jpg" width=75 height=75></td>
-<td bgcolor=LightCoral><img src="thumbnails/Suburb_image_0156.jpg" width=113 height=75><br><small>Suburb</small></td>
-<td bgcolor=LightCoral><img src="thumbnails/Industrial_image_0087.jpg" width=112 height=75><br><small>Industrial</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Highway_image_0155.jpg" width=75 height=75><br><small>Coast</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Highway_image_0036.jpg" width=75 height=75><br><small>Mountain</small></td>
-</tr>
-<tr>
-<td>OpenCountry</td>
-<td>0.310</td>
-<td bgcolor=LightBlue><img src="thumbnails/OpenCountry_image_0207.jpg" width=75 height=75></td>
-<td bgcolor=LightBlue><img src="thumbnails/OpenCountry_image_0187.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/OpenCountry_image_0065.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/OpenCountry_image_0018.jpg" width=75 height=75></td>
-<td bgcolor=LightCoral><img src="thumbnails/Forest_image_0009.jpg" width=75 height=75><br><small>Forest</small></td>
-<td bgcolor=LightCoral><img src="thumbnails/Kitchen_image_0033.jpg" width=57 height=75><br><small>Kitchen</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/OpenCountry_image_0103.jpg" width=75 height=75><br><small>Suburb</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/OpenCountry_image_0005.jpg" width=75 height=75><br><small>Coast</small></td>
-</tr>
-<tr>
-<td>Coast</td>
-<td>0.400</td>
-<td bgcolor=LightBlue><img src="thumbnails/Coast_image_0307.jpg" width=75 height=75></td>
-<td bgcolor=LightBlue><img src="thumbnails/Coast_image_0228.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Coast_image_0112.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Coast_image_0033.jpg" width=75 height=75></td>
-<td bgcolor=LightCoral><img src="thumbnails/Mountain_image_0083.jpg" width=75 height=75><br><small>Mountain</small></td>
-<td bgcolor=LightCoral><img src="thumbnails/Mountain_image_0041.jpg" width=75 height=75><br><small>Mountain</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Coast_image_0077.jpg" width=75 height=75><br><small>InsideCity</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Coast_image_0087.jpg" width=75 height=75><br><small>OpenCountry</small></td>
-</tr>
-<tr>
-<td>Mountain</td>
-<td>0.290</td>
-<td bgcolor=LightBlue><img src="thumbnails/Mountain_image_0302.jpg" width=75 height=75></td>
-<td bgcolor=LightBlue><img src="thumbnails/Mountain_image_0151.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Mountain_image_0119.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Mountain_image_0018.jpg" width=75 height=75></td>
-<td bgcolor=LightCoral><img src="thumbnails/Store_image_0107.jpg" width=100 height=75><br><small>Store</small></td>
-<td bgcolor=LightCoral><img src="thumbnails/Bedroom_image_0071.jpg" width=112 height=75><br><small>Bedroom</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Mountain_image_0065.jpg" width=75 height=75><br><small>Kitchen</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Mountain_image_0049.jpg" width=75 height=75><br><small>Forest</small></td>
-</tr>
-<tr>
-<td>Forest</td>
-<td>0.140</td>
-<td bgcolor=LightBlue><img src="thumbnails/Forest_image_0132.jpg" width=75 height=75></td>
-<td bgcolor=LightBlue><img src="thumbnails/Forest_image_0309.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Forest_image_0080.jpg" width=75 height=75></td>
-<td bgcolor=LightGreen><img src="thumbnails/Forest_image_0111.jpg" width=75 height=75></td>
-<td bgcolor=LightCoral><img src="thumbnails/Mountain_image_0039.jpg" width=75 height=75><br><small>Mountain</small></td>
-<td bgcolor=LightCoral><img src="thumbnails/Street_image_0135.jpg" width=75 height=75><br><small>Street</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Forest_image_0057.jpg" width=75 height=75><br><small>Suburb</small></td>
-<td bgcolor=#FFBB55><img src="thumbnails/Forest_image_0083.jpg" width=75 height=75><br><small>Kitchen</small></td>
-</tr>
-<tr>
-<th>Category name</th>
-<th>Accuracy</th>
-<th colspan=2>Sample training images</th>
-<th colspan=2>Sample true positives</th>
-<th colspan=2>False positives with true label</th>
-<th colspan=2>False negatives with wrong predicted label</th>
-</tr>
-</table>
-</center>
+<h4>Training Set Misclassification Examples</h4>
+<p>Since there were only 3 misclassifications in the test set, to get a better idea of what kinds of images give the classifier trouble with we ran the whole training set through as well. For each class up to 3 misclassified images were randomly selected. Again the nothing class is commonly is involved in misclassification. Night time images also have issues. Most of the scores are still low however.</p>
+<img style="max-width: 100%; padding-bottom: 40px" src="images/train_mis_class.jpg">
 
 <h3>Conclusions</h3>
-<div style="clear:both" >
-<p> 	Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<div style="clear:both;" >
+<p>Over multiple tests, accuracy ranged from 83% to 97%. The variability is mainly attributable to the images being randomly split into training and testing sets. The general trend of the nothing class and night time images being the main difficulty is apparent in each test. Overall the classifier performed well given the size of the training set and the imbalanced class sizes. Transfer learning appears to be a viable method for identifying animals and determining if a photo contains an animal, assuming only photos from known cameras are classified. It will be interesting to see how well retraining works with models other than Inception-v3 and with data sets that come from a large number of different trail cameras.</p>
 </div>
+
+<h5>References</h5>
+<div style="clear:both; padding-bottom: 120px; max-width: 60%; margin-top: 20px" >
+<ul>
+<li><a href="https://arxiv.org/pdf/1603.06169.pdf">Towards Automatic Wild Animal Monitoring: Identication of Animal Species in Camera-trap Images using Very Deep Convolutional Neural Networks</a></li>
+<li><a href="https://github.com/Hvass-Labs/TensorFlow-Tutorials">Hvass-Labs Tutorials</a></li>
+<li><a href="https://www.youtube.com/watch?v=upfgTWrhkpg">Hvass-Labs Retraining Video</a></li>
+<li><a href="https://research.googleblog.com/2016/03/train-your-own-image-classifier-with.html">Google Blog</a></li>
+<li><a href="https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/">Tensor Flow for Poets Tutorial</a></li>
+</div>
+
 </body>
 </html>
+
+
