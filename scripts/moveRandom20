@@ -1,0 +1,6 @@
+for dir in `ls $1`; do
+	mkdir $2/$dir
+	ls $1/$dir |sort -R |tail -20 |while read file; do
+		mv $1/$dir/$file $2/$dir/$file;
+	done
+done

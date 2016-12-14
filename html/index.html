@@ -168,7 +168,7 @@ table td img {
 
 <h3>Results: Classifying images from one camera after training on the other</h3>
 
-<p> The inceptionV3 network was retrained using data from SSU preserves Camera4, and subsequently tested on images from Camera3. The resulting accuracy was 0.641182466871 . Below is the confidence matrix and ROC curve for this run</p>
+<p> The inceptionV3 network was retrained using data from SSU preserves Camera4, using default parameters for the example script (retrain.py) and subsequently tested on images from Camera3. The resulting accuracy was 0.641182466871 . Below is the confidence matrix and ROC curve for this run</p>
 
 <div class="row-images">
     <div style="display: inline; padding: 20px">
@@ -180,6 +180,24 @@ table td img {
 </div>
 
 <p> This was less than ideal because the training set contained fewer images than the test set. Also, the classifier may have been learning from features that were unique to that specific camera location rather than being more general.</p>
+
+<h3>Results: Selecting random 20 from manually classified images</h3>
+
+<p> This time, 20 images were randomly selected from the training set and put aside. The training batch size was lowered to 20, and the learning rate was lowered to .001. The testing accuracy was 87.6%. Here are the confidence matrices and the ROC curve.</p>
+
+<div class="row-images">
+    <div style="display: inline; padding: 20px">
+    <img style="max-width: 40%" src="images/confmatRandom20.png" />
+    </div>
+    <div style="display: inline; padding: 20px">
+    <img style="max-width: 40%" src="images/ROCRandom20.png" />
+    </div>
+</div>
+
+
+
+
+
 
 <p> 	Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 
