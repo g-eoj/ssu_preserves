@@ -166,7 +166,7 @@ table td img {
 
 <p> The TensorFlow library developed at Google and now open-sourced does these types of computations, and several API's exist in different languages. With TensorFlow, we can use the InceptionV3 network (pictured above), which was trained for image recognition contests for datasets consisting of as many as 1000 classes. This network can be retrained through a process known as "transfer learning". Transfer learning enables us to remove the final layer of the network and retrain it to recognize images from our dataset. We manually classified images and then used a modified example script to retran the network successfully.</p>
 
-<h3>Results: Classifying images from one camera after training on the other</h3>
+<h3>Results(1): Classifying images from one camera after training on the other</h3>
 
 <p> The inceptionV3 network was retrained using data from SSU preserves Camera4, using default parameters for the example script (retrain.py) and subsequently tested on images from Camera3. The resulting accuracy was 0.641182466871 . Below is the confidence matrix and ROC curve for this run</p>
 
@@ -181,9 +181,22 @@ table td img {
 
 <p> This was less than ideal because the training set contained fewer images than the test set. Also, the classifier may have been learning from features that were unique to that specific camera location rather than being more general.</p>
 
-<h3>Results: Selecting random 20 from manually classified images</h3>
+<h3>Results(2): Selecting random 20 from manually classified images</h3>
 
-<p> This time, 20 images were randomly selected from the training set and put aside. The training batch size was lowered to 20, and the learning rate was lowered to .001. The testing accuracy was 87.6%. Here are the confidence matrices and the ROC curve.</p>
+<p>Our entire data set looks like</p>
+<pre><code>
+37, ./training_images/bobcat
+627, ./training_images/deer
+143, ./training_images/human
+332, ./training_images/nothing
+26, ./training_images/possum
+87, ./training_images/skunk
+384, ./training_images/squirrel
+40, ./training_images/turkey
+1676, Total
+</code></pre>
+
+<p> This time, 20 images were randomly selected from the dataset and put aside. The training batch size was lowered to 20, and the learning rate was lowered to .001. The testing accuracy was 87.6%. Here are the confidence matrices and the ROC curve.</p>
 
 <div class="row-images">
     <div style="display: inline; padding: 20px">
@@ -194,8 +207,35 @@ table td img {
     </div>
 </div>
 
+<h3>Results(3): Selecting random 20 from a test set derived from a different camera</h3>
+<p> Was the classifier learning things specific to the camera or how to recognize animals more generally? Images were separated by camera, and classes were removed from the training set that did not have enough images for either the training or the testing camera (turkey, possum, human, bobcat). Here is the directory listing:</p>
+<pre><code>
+558, ./trainingDir/deer
+192, ./trainingDir/nothing
+30, ./trainingDir/skunk
+189, ./trainingDir/squirrel
+969, Total
+
+20, ./testDir/deer
+20, ./testDir/nothing
+20, ./testDir/skunk
+20, ./testDir/squirrel
+121, Total
+</code></pre>
+<p>Here are the resulting confidence matrix and ROC curves</p>
+<div class="row-images">
+    <div style="display: inline; padding: 20px">
+    <img style="max-width: 40%" src="images/confmatSeparate.png" />
+    </div>
+    <div style="display: inline; padding: 20px">
+    <img style="max-width: 40%" src="images/ROCSeparate.png" />
+    </div>
+</div>
 
 
+<h3>Conclusions:</h3>
+<p>It looks as if the classifier is learning to interpret camera specific features. This means that if this system were to be deployed, it would likely do poorly until a human being had manually classified a large number of images.</p>
+<p>Still, test 3 performed better than random chance. If labeled data were to be provided/created for more cameras, work could be done trying to get some kind of camera-independent accuracy.</p>
 
 
 
