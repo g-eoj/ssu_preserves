@@ -1,5 +1,9 @@
 # CS 385 Project 
 
+### Link to manually classified image set
+
+https://drive.google.com/open?id=0B-AmqiOmDIQER0lObEo1QWJPRjQ
+
 ### Setup
 
 Install [miniconda](http://conda.pydata.org/miniconda.html).
