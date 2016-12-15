@@ -40,7 +40,7 @@ FLAGS = tf.app.flags.FLAGS
 # Input and output file flags.
 
 tf.app.flags.DEFINE_string('image_dir',
-                           '/home/student/cburke/tfstuff/imgs/cam3output'
+                           '/home/student/jgranado/cs385/project/ssu_preserves/testing_images/'
                            , """Path to folders of labeled images.""")
 tf.app.flags.DEFINE_string('output_graph', './tmp/output_graph.pb',
                            """Where is the trained graph saved?""")
@@ -281,12 +281,12 @@ def plot_confusion_matrix(
         plt.text(j, i, round(cm[i, j], 3), horizontalalignment='center'
                  , color=('white' if cm[i, j] > thresh else 'black'))
 
-    plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+    plt.tight_layout()
 
 
-def getROC(predictions, labels, class_list):
+def getROC(predictions, scores, class_list):
 
     # Compute ROC curve and ROC area for each class
 
@@ -294,7 +294,7 @@ def getROC(predictions, labels, class_list):
     tpr = dict()
     roc_auc = dict()
     for i in range(len(class_list)):
-        (fpr[i], tpr[i], _) = roc_curve(predictions, labels, i)
+        (fpr[i], tpr[i], _) = roc_curve(predictions, scores, i)
         roc_auc[i] = auc(fpr[i], tpr[i])
     return (fpr, tpr, roc_auc)
 
@@ -435,6 +435,7 @@ def withBottlenecks():
         # just manually crunch through all the images and predict what they are
 
         prediction_list = []
+        prediction_scores_list = []
         for i in range(len(image_list)):
             bottle = \
                 np.array(dictionary[os.path.basename(image_list[i])])
@@ -445,15 +446,18 @@ def withBottlenecks():
                 print('running image iteration ', i)
             prediction = sess.run(getPredictions(final_tensor),
                                   feed_dict={bottleneck_input: [bottle]})
+            prediction_score = sess.run(final_tensor,
+                                  feed_dict={bottleneck_input: [bottle]})
             prediction_list.append(prediction)
+            prediction_scores_list.append(prediction_score)
         prediction_list = np.squeeze(prediction_list)
-        processResults(prediction_list, simpleClassList, class_list)
+        processResults(prediction_list, prediction_scores_list, ground_truth, class_list)
         copyErrorImages(image_list, prediction_list, simpleClassList, class_list)
 
 
-def processResults(prediction_list, truth, class_list):
+def processResults(prediction_list, prediction_scores_list, truth, class_list):
     plt.figure()
-    (fpr, tpr, roc_auc) = getROC(prediction_list, truth, class_list)
+    (fpr, tpr, roc_auc) = getROC(truth, prediction_scores_list, class_list)
     multiClassROC(fpr, tpr, roc_auc, class_list)
 
         # print ("predictions", prediction_list);
