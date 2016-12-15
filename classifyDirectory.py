@@ -40,7 +40,7 @@ FLAGS = tf.app.flags.FLAGS
 # Input and output file flags.
 
 tf.app.flags.DEFINE_string('image_dir',
-                           '/home/student/jgranado/cs385/project/ssu_preserves/testing_images/'
+                           '/home/student/cburke/tfstuff/imgs/testDir'
                            , """Path to folders of labeled images.""")
 tf.app.flags.DEFINE_string('output_graph', './tmp/output_graph.pb',
                            """Where is the trained graph saved?""")
@@ -286,15 +286,18 @@ def plot_confusion_matrix(
     plt.tight_layout()
 
 
-def getROC(predictions, scores, class_list):
+def getROC(ground_truth, scores, class_list):
 
     # Compute ROC curve and ROC area for each class
 
     fpr = dict()
     tpr = dict()
     roc_auc = dict()
+    ground_truth = np.array(ground_truth);
+    scores = np.array(scores);
+    scores = np.squeeze(scores)
     for i in range(len(class_list)):
-        (fpr[i], tpr[i], _) = roc_curve(predictions, scores, i)
+        (fpr[i], tpr[i], _) = roc_curve(ground_truth[:, i], scores[:, i])
         roc_auc[i] = auc(fpr[i], tpr[i])
     return (fpr, tpr, roc_auc)
 
@@ -451,11 +454,12 @@ def withBottlenecks():
             prediction_list.append(prediction)
             prediction_scores_list.append(prediction_score)
         prediction_list = np.squeeze(prediction_list)
-        processResults(prediction_list, prediction_scores_list, ground_truth, class_list)
+        print("gt", ground_truth)
+        processResults(prediction_list, prediction_scores_list, ground_truth, simpleClassList, class_list)
         copyErrorImages(image_list, prediction_list, simpleClassList, class_list)
 
 
-def processResults(prediction_list, prediction_scores_list, truth, class_list):
+def processResults(prediction_list, prediction_scores_list, truth, simpleClassList, class_list):
     plt.figure()
     (fpr, tpr, roc_auc) = getROC(truth, prediction_scores_list, class_list)
     multiClassROC(fpr, tpr, roc_auc, class_list)
@@ -463,9 +467,9 @@ def processResults(prediction_list, prediction_scores_list, truth, class_list):
         # print ("predictions", prediction_list);
         # print ("truth      ", truth);
 
-    eq = np.equal(prediction_list, truth)
+    eq = np.equal(prediction_list, simpleClassList)
     results = np.mean(eq)
-    conf_mat = confusion_matrix(prediction_list, truth)
+    conf_mat = confusion_matrix(prediction_list, simpleClassList)
     print('results', results)
     print('confusion matrix:')
     print(conf_mat)
@@ -488,61 +492,6 @@ def copyErrorImages(filenames, predictions, truth, class_names):
             shutil.copyfile(filenames[i], where)
             #print (str(count) + " missclassified images!");
 
-def somethingOrOther():
-    class_list = getClassNames()
-    (image_list, ground_truth, simpleClassList) = \
-        get_image_and_ground_truth(class_list)
-
-    # for i in range(len(image_list)):
-        # print(i, image_list[i], ground_truth[i])
-
-    (
-        graph,
-        bottleneck_input,
-        jpeg_data_tensor,
-        resized_image_tensor,
-        final_tensor,
-        ground_truth_tensor,
-        ) = create_graph(len(class_list))
-    image_data = get_image_data(image_list)
-    with tf.Session() as sess:
-
-        # just manually crunch through all the images and predict what they are
-
-        prediction_list = []
-        for i in range(len(image_data)):
-            if i % 50 == 0:
-                print('running image iteration ', i)
-            prediction = sess.run(getPredictions(final_tensor),
-                                  feed_dict={jpeg_data_tensor: image_data[i]})
-            prediction_list.append(prediction)
-        prediction_list = np.squeeze(prediction_list)
-
-        # now get the truth from the ground_truth_tensor
-
-        truth_op = tf.argmax(ground_truth_tensor, 1)
-        truth = sess.run(truth_op,
-                         feed_dict={ground_truth_tensor: ground_truth})
-        (fpr, tpr, roc_auc) = getROC(prediction_list, truth, class_list)
-        multiClassROC(fpr, tpr, roc_auc, class_list)
-        print('predictions', prediction_list)
-        print('truth      ', truth)
-        eq = np.equal(prediction_list, truth)
-        results = np.mean(eq)
-        conf_mat = confusion_matrix(prediction_list, truth)
-        print('results', results)
-        print('confusion matrix:')
-        print(conf_mat)
-
-        # figplt.figure()
-
-        plot_confusion_matrix(conf_mat, classes=class_list,
-                              normalize=True,
-                              title='Normalized confusion matrix')
-
-
-        # fig.savefig('confusion_matrix.png')
-        # plt.show()
 
 if __name__ == '__main__':
     tf.app.run()
