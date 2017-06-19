@@ -2,7 +2,8 @@
 
 ### Link to manually classified image set
 
-https://drive.google.com/open?id=0B-AmqiOmDIQER0lObEo1QWJPRjQ
+https://drive.google.com/file/d/0B5KlN_xHjgamOUU1dEQzZ2Z2dnc/view?usp=sharing
+
 
 ### Setup
 
@@ -20,6 +21,7 @@ Install packages:
 
     conda install scikit-learn
     conda install matplotlib
+    conda install pillow
 
 Install TensorFlow on Mac:
  
