@@ -40,8 +40,8 @@ FLAGS = tf.app.flags.FLAGS
 # Input and output file flags.
 
 tf.app.flags.DEFINE_string('image_dir',
-                           '/home/student/cburke/tfstuff/imgs/testDir'
-                           , """Path to folders of labeled images.""")
+                           './test_images _blah to throw this off. Use --image_dir in command line'
+                           , """Path to folder of test images.""")
 tf.app.flags.DEFINE_string('output_graph', './tmp/output_graph.pb',
                            """Where is the trained graph saved?""")
 tf.app.flags.DEFINE_string('output_labels', './tmp/output_labels.txt',
@@ -365,7 +365,7 @@ def multiClassROC(
     plt.ylabel('True Positive Rate')
     plt.title('ROC plot')
     plt.legend(loc='lower right')
-    plt.savefig('ROC.png')
+    plt.savefig('test_ROC.png')
 
 
     # plt.show()
@@ -469,16 +469,24 @@ def processResults(prediction_list, prediction_scores_list, truth, simpleClassLi
 
     eq = np.equal(prediction_list, simpleClassList)
     results = np.mean(eq)
-    conf_mat = confusion_matrix(prediction_list, simpleClassList)
+    conf_mat = confusion_matrix(simpleClassList, prediction_list) 
     print('results', results)
     print('confusion matrix:')
     print(conf_mat)
     plt.figure()
+    plot_confusion_matrix(conf_mat, classes=class_list, normalize=False,
+                          title='Confusion matrix')
+    plt.savefig('test_confusion_matrix.png')
+    plt.figure()
     plot_confusion_matrix(conf_mat, classes=class_list, normalize=True,
                           title='Normalized confusion matrix')
-    plt.savefig('confusion_matrix.png')
+    plt.savefig('test_confusion_matrix_normalized.png')
 
 def copyErrorImages(filenames, predictions, truth, class_names):
+    if not os.path.exists(FLAGS.misclassified_dir):
+        print("Creating directory to store misclassified images: ", FLAGS.misclassified_dir)
+        os.makedirs(FLAGS.misclassified_dir)
+        
     count = 0
     for i in range(len(filenames)):
         predicted = predictions[i]
