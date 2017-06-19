@@ -67,6 +67,7 @@ from __future__ import print_function
 from datetime import datetime
 import glob
 import hashlib
+import math
 import os.path
 import random
 import re
@@ -98,7 +99,7 @@ tf.app.flags.DEFINE_string('summaries_dir', './tmp/retrain_logs',
                           """Where to save summary logs for TensorBoard.""")
 
 # Details of the training configuration.
-tf.app.flags.DEFINE_integer('how_many_training_steps', 20000,
+tf.app.flags.DEFINE_integer('how_many_training_steps', 6000,
                             """How many training steps to run before ending.""")
 tf.app.flags.DEFINE_float('learning_rate', 0.001,
                           """How large a learning rate to use when training.""")
@@ -737,6 +738,10 @@ def add_final_training_ops(class_count, final_tensor_name, bottleneck_tensor):
     The tensors for the training and cross entropy results, and tensors for the
     bottleneck input and ground truth input.
   """
+  with tf.name_scope('learning_rate'):  
+    lr = tf.placeholder(tf.float32)
+    tf.scalar_summary('learning rate', lr)
+
   with tf.name_scope('input'):
     bottleneck_input = tf.placeholder_with_default(
         bottleneck_tensor, shape=[None, BOTTLENECK_TENSOR_SIZE],
@@ -771,11 +776,14 @@ def add_final_training_ops(class_count, final_tensor_name, bottleneck_tensor):
     tf.scalar_summary('cross entropy', cross_entropy_mean)
 
   with tf.name_scope('train'):
-    train_step = tf.train.GradientDescentOptimizer(FLAGS.learning_rate).minimize(
+    #optimizer
+    #train_step = tf.train.AdamOptimizer(FLAGS.learning_rate).minimize(
+    #    cross_entropy_mean)
+    train_step = tf.train.AdamOptimizer(lr).minimize(
         cross_entropy_mean)
 
   return (train_step, cross_entropy_mean, bottleneck_input, ground_truth_input,
-          final_tensor)
+          final_tensor, lr)
 
 
 def add_evaluation_step(result_tensor, ground_truth_tensor):
@@ -850,7 +858,7 @@ def main(_):
 
   # Add the new layer that we'll be training.
   (train_step, cross_entropy, bottleneck_input, ground_truth_input,
-   final_tensor) = add_final_training_ops(len(image_lists.keys()),
+   final_tensor, lr) = add_final_training_ops(len(image_lists.keys()),
                                           FLAGS.final_tensor_name,
                                           bottleneck_tensor)
 
@@ -884,9 +892,15 @@ def main(_):
           bottleneck_tensor)
     # Feed the bottlenecks and ground truth into the graph, and run a training
     # step. Capture training summaries for TensorBoard with the `merged` op.
+    # decay
+    max_learning_rate = 0.003
+    min_learning_rate = 0.0001
+    decay_speed = 2000.0 # 0.003-0.0001-2000=>0.9826 done in 5000 iterations
+    learning_rate_decayed = min_learning_rate + (max_learning_rate - min_learning_rate) * math.exp(-i/decay_speed)
     train_summary, _ = sess.run([merged, train_step],
              feed_dict={bottleneck_input: train_bottlenecks,
-                        ground_truth_input: train_ground_truth})
+                        ground_truth_input: train_ground_truth,
+                        lr: learning_rate_decayed})
     train_writer.add_summary(train_summary, i)
 
     # Every so often, print out how well the graph is training.
@@ -910,7 +924,8 @@ def main(_):
       validation_summary, validation_accuracy = sess.run(
           [merged, evaluation_step],
           feed_dict={bottleneck_input: validation_bottlenecks,
-                     ground_truth_input: validation_ground_truth})
+                     ground_truth_input: validation_ground_truth,
+                     lr: learning_rate_decayed})
       validation_writer.add_summary(validation_summary, i)
       print('%s: Step %d: Validation accuracy = %.1f%%' %
             (datetime.now(), i, validation_accuracy * 100))
@@ -936,7 +951,7 @@ def main(_):
   print(confusion);
   print(image_lists.keys());
   print("Training Steps:", FLAGS.how_many_training_steps)
-  print("Learning Rate:", FLAGS.learning_rate)
+  #print("Learning Rate:", FLAGS.learning_rate)
   print("Train Batch Size:", FLAGS.train_batch_size)
   print("Validation Batch Size:", FLAGS.validation_batch_size)
   print("Test Batch Size:", FLAGS.test_batch_size)
