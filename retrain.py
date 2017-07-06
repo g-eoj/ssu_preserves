@@ -109,7 +109,7 @@ tf.app.flags.DEFINE_integer(
 tf.app.flags.DEFINE_integer(
     'validation_percentage', 10,
     """What percentage of images to use as a validation set.""")
-tf.app.flags.DEFINE_integer('eval_step_interval', 100,
+tf.app.flags.DEFINE_integer('eval_step_interval', 10,
                             """How often to evaluate the training results.""")
 tf.app.flags.DEFINE_integer('train_batch_size', 20,
                             """How many images to train on at a time.""")

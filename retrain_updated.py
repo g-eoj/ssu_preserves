@@ -65,11 +65,11 @@ program, for example the label_image sample code.
 
 To use with TensorBoard:
 
-By default, this script will log summaries to /tmp/retrain_logs directory
+By default, this script will log summaries to ./tmp/retrain_updated_logs directory
 
 Visualize the summaries with this command:
 
-tensorboard --logdir /tmp/retrain_logs
+tensorboard --logdir ./tmp/retrain_updated_logs
 
 """
 from __future__ import absolute_import
@@ -915,7 +915,7 @@ def main(_):
       # Feed the bottlenecks and ground truth into the graph, and run a training
       # step. Capture training summaries for TensorBoard with the `merged` op.
       #decay
-      max_learning_rate = 0.003
+      max_learning_rate = 0.001
       min_learning_rate = 0.0001
       decay_speed = 2000.0  # 0.003-0.0001-2000=>0.9826 done in 5000 iterations
       learning_rate_decayed = min_learning_rate + (max_learning_rate - min_learning_rate) * math.exp(-i / decay_speed)
@@ -1008,13 +1008,13 @@ if __name__ == '__main__':
   parser.add_argument(
       '--output_graph',
       type=str,
-      default='./tmp/output_graph.pb',
+      default='./tmp/output_updated_graph.pb',
       help='Where to save the trained graph.'
   )
   parser.add_argument(
       '--intermediate_output_graphs_dir',
       type=str,
-      default='./tmp/intermediate_graph/',
+      default='./tmp/intermediate_updated_graph/',
       help='Where to save the intermediate graphs.'
   )
   parser.add_argument(
@@ -1026,19 +1026,19 @@ if __name__ == '__main__':
   parser.add_argument(
       '--output_labels',
       type=str,
-      default='./tmp/output_labels.txt',
+      default='./tmp/output_updated_labels.txt',
       help='Where to save the trained graph\'s labels.'
   )
   parser.add_argument(
       '--summaries_dir',
       type=str,
-      default='./tmp/retrain_logs',
+      default='./tmp/retrain_updated_logs',
       help='Where to save summary logs for TensorBoard.'
   )
   parser.add_argument(
       '--how_many_training_steps',
       type=int,
-      default=4000,
+      default= 6000,
       help='How many training steps to run before ending.'
   )
   parser.add_argument(
