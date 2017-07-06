@@ -7,7 +7,6 @@ The following improvements were made to retrain.py in order to further validate 
 ### retrain_updated.py
 
 retrain.py was updated to tensorflow 1.2
-
 Exponentially decaying learning rate was implemented.
 
 ### retrain_updated_time_stamp.py
@@ -24,7 +23,6 @@ folder.
 
 The model now uses k-fold validation. The number of folds can be set to an arbitrary k by editing the hyper-
 parameter: '--how_many_folds'.
-
 The confusion matrix is now plotted using matplotlib
 
 ### retrain_updated_image_augmentation.py
