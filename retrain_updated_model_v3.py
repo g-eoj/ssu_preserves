@@ -65,18 +65,22 @@ program, for example the label_image sample code.
 
 To use with TensorBoard:
 
-By default, this script will log summaries to ./tmp/retrain_updated_kfold_logs directory
+By default, this script will log summaries to ./tmp/retrain_updated_modelv3_logs directory
 
 Visualize the summaries with this command:
 
-tensorboard --logdir ./tmp/retrain_updated_kfold_logs
+tensorboard --logdir ./tmp/retrain_updated_modelv3_logs
 
 """
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import urllib
 
+from PIL import Image
+from PIL import ImageOps
+from PIL import ImageEnhance
 
 import argparse
 from datetime import datetime
@@ -91,7 +95,8 @@ import exifread as EXIF
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
-
+from random import randint
+from itertools import cycle
 import itertools
 from tensorflow.python.framework import graph_util
 from tensorflow.python.framework import tensor_shape
@@ -107,16 +112,85 @@ FLAGS = None
 # pylint: disable=line-too-long
 DATA_URL = 'http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz'
 # pylint: enable=line-too-long
-BOTTLENECK_TENSOR_NAME = 'pool_3/_reshape:0'
-BOTTLENECK_TENSOR_SIZE = 1528
+BOTTLENECK_TENSOR_NAME = 'InceptionV3/Logits/Dropout_1b/Identity:0'
+BOTTLENECK_TENSOR_SIZE = 2048
 MODEL_INPUT_WIDTH = 299
 MODEL_INPUT_HEIGHT = 299
 MODEL_INPUT_DEPTH = 3
-JPEG_DATA_TENSOR_NAME = 'DecodeJpeg/contents:0'
-RESIZED_INPUT_TENSOR_NAME = 'ResizeBilinear:0'
+JPEG_DATA_TENSOR_NAME = 'input'
+RESIZED_INPUT_TENSOR_NAME = 'input:0'
 MAX_NUM_IMAGES_PER_CLASS = 2 ** 27 - 1  # ~134M
 
 
+def augment_images(image_dir):
+    """Augments images non-randomly
+    """
+    if not gfile.Exists(image_dir):
+        print("Image directory '" + image_dir + "' not found.")
+        return None
+    sub_dirs = [x[0] for x in gfile.Walk(image_dir)]
+    # The root directory comes first, so skip it.
+    is_root_dir = True
+
+    for sub_dir in sub_dirs:
+        if is_root_dir:
+            is_root_dir = False
+            continue
+        extensions = ['jpg', 'jpeg', 'JPG', 'JPEG']
+        file_list = []
+        dir_name = os.path.basename(sub_dir)
+        if dir_name == image_dir:
+            continue
+        print("Augmenting images in '" + dir_name + "'")
+        for extension in extensions:
+            file_glob = os.path.join(image_dir, dir_name, '*.' + extension)
+            file_list.extend(gfile.Glob(file_glob))
+        if not file_list:
+            print('No files found')
+            continue
+        if len(file_list) < 20:
+            print('WARNING: Folder has less than 20 images, which may cause issues.')
+        elif len(file_list) > MAX_NUM_IMAGES_PER_CLASS:
+            print('WARNING: Folder {} has more than {} images. Some images will '
+                  'never be selected.'.format(dir_name, MAX_NUM_IMAGES_PER_CLASS))
+        for file_name in file_list:
+            is_image_distorted = "distorted" in file_name
+            if is_image_distorted == False: #Check to make sure image is not already distorted
+                image = Image.open(file_name) #open current image
+                exif = image.info['exif'] #get current image exif data
+                
+                #Uncomment the distortions below that you would like to apply
+                
+                # mirror_image = ImageOps.mirror(image)
+                # mirror_image.save(file_name[:-4]+ '_mirror_distorted.JPG', exif=exif)
+
+
+                # blur_image = ImageOps.box_blur(image, 3)
+                # blur_image.save(file_name[:-4] + '_blur_distorted.JPG', exif=exif)
+
+                #random_rotate = randint(-10, 10)
+                #rotate_image = image.rotate(random_rotate)
+                #width, height = rotate_image.size
+                #rotate_image_crop = ImageOps.crop(rotate_image, height / 8)
+                #rotate_image_crop.save(file_name[:-4]+ '_rotate_distorted.JPG', exif=exif)
+
+
+                # enhancer = ImageEnhance.Brightness(image)
+                # bright_image = enhancer.enhance(1.3)
+                # bright_image.save(file_name[:-4]+ '_brightness_distorted.JPG', exif=exif)
+
+
+                #width, height = image.size
+                #crop_image_1 = image.crop((0, 0, width / 2, height / 2))
+                #crop_image_1.save(file_name[:-4] + '_crop_1_distorted.JPG', exif=exif)
+
+                #crop_image_2 = image.crop((width / 2, height / 2, width, height))
+                #crop_image_2.save(file_name[:-4] + '_crop_2_distorted.JPG', exif=exif)
+
+                #crop_image_3 = image.crop((width / 2, 0, width, height / 2))
+                #crop_image_3.save(file_name[:-4] + '_crop_3_distorted.JPG', exif=exif)
+                #crop_image_4 = image.crop((0, height / 2, width / 2, height))
+                #crop_image_4.save(file_name[:-4] + '_crop_4_distorted.JPG', exif=exif)
 
 
 def create_image_lists(image_dir):
@@ -142,7 +216,8 @@ def create_image_lists(image_dir):
     # Create a dictionary which will contain a list of images for each fold
     # Sole purpose is to generate text files that state what is in each fold
     fold_dict_all = {}
-
+    group_num = 0
+    open('image_groups.txt', 'w').close()
     l = 1
     while l <= folds:
         # Append k empty dictionaries to result_list
@@ -193,7 +268,7 @@ def create_image_lists(image_dir):
             is_brightness_applied = "brightness" in file_name
             is_rotation_applied = "rotate" in file_name
             is_crop_applied = "crop" in file_name
-            #Distortions added below will NOT be added to folds
+
             if is_crop_applied == False and is_brightness_applied == False and is_blur_applied == False and is_mirror_applied == False and is_rotation_applied == False:
 
                 with open(file_name, 'rb') as fh:  # get the capture date
@@ -220,8 +295,19 @@ def create_image_lists(image_dir):
                 old = datetime.strptime(str(dateTaken), "%Y:%m:%d %H:%M:%S")  # Set current image timestamp to old
                 not_first_run = True  # Change boolean to indicate that it is no longer the first iteration
 
-        list_image_groups.append(
-            temp_list)  # add the final temp list to list_image_groups since it will not be added otherwise
+        list_image_groups.append(temp_list)  # add the final temp list to list_image_groups since it will not be added otherwise
+
+
+
+        for group in list_image_groups:
+            group_num +=1
+            for image in group:
+                file_a = open('image_groups.txt', 'a')
+                file_a.write(sub_dir[18:]+'/'+image + " " + str(group_num))
+                file_a.write("\n")
+                file_a.close()
+
+
 
         '''Uncomment below loop and comment above loop to stop separating based on capture event
         for file_name in file_list:
@@ -265,6 +351,7 @@ def create_image_lists(image_dir):
                 'testing': fold_dict[t]
             }
             t += 1
+
 
     # Creates text files detailing images in each fold
     m = 1
@@ -343,7 +430,7 @@ def create_inception_graph():
   """
     with tf.Graph().as_default() as graph:
         model_filename = os.path.join(
-            FLAGS.model_dir, 'classify_image_graph_def.pb')
+            FLAGS.model_dir, 'inception_v3_2016_08_28_frozen.pb')
         with gfile.FastGFile(model_filename, 'rb') as f:
             graph_def = tf.GraphDef()
             graph_def.ParseFromString(f.read())
@@ -561,7 +648,7 @@ def cache_bottlenecks(sess, image_lists, image_dir, bottleneck_dir,
 def get_random_cached_bottlenecks(sess, image_lists, how_many, category,
                                   bottleneck_dir, image_dir, jpeg_data_tensor,
                                   bottleneck_tensor):
-    """Retrieves bottleneck values for cached images.
+    """Retrieves bottleneck values for cached images.z
 
   If no distortions are being applied, this function can retrieve the cached
   bottleneck values directly from disk for images. It picks a random set of
@@ -799,7 +886,7 @@ def variable_summaries(var):
 
 
 def add_final_training_ops(class_count, final_tensor_name, bottleneck_tensor):
-    """Adds a new softmax and fully-connected layer for traini0ng.
+    """Adds a new softmax and fully-connected layer for training.
 
   We need to retrain the top layer to identify our new classes, so this function
   adds the right operations to the graph, along with some variables to hold the
@@ -818,6 +905,7 @@ def add_final_training_ops(class_count, final_tensor_name, bottleneck_tensor):
     The tensors for the training and cross entropy results, and tensors for the
     bottleneck input and ground truth input.
   """
+    bottleneck_tensor = tf.reshape(bottleneck_tensor, [1,2048])
     with tf.name_scope('learning_rate'):
         lr = tf.placeholder(tf.float32)
         tf.summary.scalar('learning rate', lr)
@@ -965,6 +1053,8 @@ def main(_):
     average_accuracy = []
     current_fold_num = 0
 
+    if FLAGS.augment_images: #Create augmented images if desired
+        augment_images(FLAGS.image_dir)
 
     # Look at the folder structure, and create list containing dictionaries that differ in which fold was assigned as test
     list_of_image_lists = create_image_lists(FLAGS.image_dir)
@@ -1116,13 +1206,13 @@ if __name__ == '__main__':
     parser.add_argument(
         '--output_graph',
         type=str,
-        default='./tmp/output_updated_kfold_graph.pb',
+        default='./tmp/output_updated_modelv3_graph.pb',
         help='Where to save the trained graph.'
     )
     parser.add_argument(
         '--intermediate_output_graphs_dir',
         type=str,
-        default='./tmp/intermediate_updated_kfold_graph/',
+        default='./tmp/intermediate_updated_modelv3_graph/',
         help='Where to save the intermediate graphs.'
     )
     parser.add_argument(
@@ -1134,19 +1224,19 @@ if __name__ == '__main__':
     parser.add_argument(
         '--output_labels',
         type=str,
-        default='./tmp/output_updated_kfold_labels.txt',
+        default='./tmp/output_updated_modelv3_labels.txt',
         help='Where to save the trained graph\'s labels.'
     )
     parser.add_argument(
         '--summaries_dir',
         type=str,
-        default='./tmp/retrain_updated_kfold_logs',
+        default='./tmp/retrain_updated_modelv3_logs',
         help='Where to save summary logs for TensorBoard.'
     )
     parser.add_argument(
         '--how_many_training_steps',
         type=int,
-        default=100,
+        default=4000,
         help='How many training steps to run before ending.'
     )
     parser.add_argument(
@@ -1201,7 +1291,14 @@ if __name__ == '__main__':
       """,
         action='store_true'
     )
-
+    parser.add_argument(
+        '--augment_images',
+        default=False,
+        help="""\
+      Whether to augment images\
+      """,
+        action='store_true'
+    )
     parser.add_argument(
         '--model_dir',
         type=str,
