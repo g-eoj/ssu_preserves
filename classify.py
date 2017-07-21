@@ -8,13 +8,13 @@ from PIL import ImageEnhance
 
 
 # location of the labels used in the retrained model
-labels = "./tmp/output_updated_augment_labels.txt"
+labels = "./tmp/output_updated_timestamp_labels.txt"
 # location of the graph for the retrained model
-model = "./tmp/output_updated_augment_graph.pb"
+model = "./tmp/output_updated_timestamp_graph.pb"
 
 # change this as you see fit
 # image_path = sys.argv[1] # uncomment to provide path from terminal
-image_path = './training_images/bobcat/Cam3_EK000258.JPG'  # to run from pycharm
+image_path = './classify_training/bobcat/Cam3_EK000257.JPG'  # to run from pycharm
 image_path_equalize = './classify_training/equalize_distorted.JPG'
 image_path_mirror = './classify_training/mirror_distorted.JPG'
 image_path_blur = './classify_training/blur_distorted.JPG'
@@ -47,7 +47,7 @@ image_data_equalize = tf.gfile.FastGFile(image_path_equalize, 'rb').read()
 image_data_mirror = tf.gfile.FastGFile(image_path_mirror, 'rb').read()
 image_data_blur = tf.gfile.FastGFile(image_path_blur, 'rb').read()
 image_data_rotate = tf.gfile.FastGFile(image_path_rotate, 'rb').read()
-image_data_list = [image_data_equalize, image_data_mirror, image_data_blur, image_data_rotate]
+image_data_list = [image_data_equalize]
 
 
 
@@ -72,7 +72,7 @@ for image_data in image_data_list:
 
         predictions = sess.run(softmax_tensor,
                  {'DecodeJpeg/contents:0': image_data})
-
+        print(predictions)
         # Sort to show labels of first prediction in order of confidence
         top_k = predictions[0].argsort()[-len(predictions[0]):][::-1]
 
@@ -82,6 +82,8 @@ for image_data in image_data_list:
             score_dict[human_string] += score
 
 sorted_score_dict = sorted(score_dict.items(), key=lambda x: x[::-1])
+print (sorted_score_dict)
+print (score_dict)
 for l in reversed(sorted_score_dict):
 
     print('%s (score = %.5f)' % (l[0], round(l[1]/i, 5)))

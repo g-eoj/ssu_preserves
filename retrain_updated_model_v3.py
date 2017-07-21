@@ -269,7 +269,7 @@ def create_image_lists(image_dir):
             is_rotation_applied = "rotate" in file_name
             is_crop_applied = "crop" in file_name
 
-            if is_crop_applied == False and is_brightness_applied == False and is_blur_applied == False and is_mirror_applied == False and is_rotation_applied == False:
+            if is_crop_applied == False and is_brightness_applied == False and is_blur_applied == False and is_mirror_applied == False : #choose distortions you do not want to use
 
                 with open(file_name, 'rb') as fh:  # get the capture date
                     tags = EXIF.process_file(fh, stop_tag="EXIF DateTimeOriginal")
@@ -454,6 +454,7 @@ def run_bottleneck_on_image(sess, image_data, image_data_tensor,
   Returns:
     Numpy array of bottleneck values.
   """
+    bottleneck_tensor = tf.reshape(bottleneck_tensor, [1, 2048])
     bottleneck_values = sess.run(
         bottleneck_tensor,
         {image_data_tensor: image_data})

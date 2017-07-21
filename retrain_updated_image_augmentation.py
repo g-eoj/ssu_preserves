@@ -157,40 +157,40 @@ def augment_images(image_dir):
             is_image_distorted = "distorted" in file_name
             if is_image_distorted == False: #Check to make sure image is not already distorted
                 image = Image.open(file_name) #open current image
-                exif = image.info['exif'] #get current image exif data
+                image = image.convert('L')
+                #exif = image.info['exif'] #get current image exif data
                 
-                #Uncomment the distortions below that you would like to apply
+                #Comment the distortions below that you would NOT like to apply
                 
-                # mirror_image = ImageOps.mirror(image)
-                # mirror_image.save(file_name[:-4]+ '_mirror_distorted.JPG', exif=exif)
+                mirror_image = ImageOps.mirror(image)
+                mirror_image.save(file_name[:-4]+ '_mirror_distorted.JPG', exif=exif)
 
 
-                # blur_image = ImageOps.box_blur(image, 3)
-                # blur_image.save(file_name[:-4] + '_blur_distorted.JPG', exif=exif)
+                blur_image = ImageOps.box_blur(image, 3)
+                blur_image.save(file_name[:-4] + '_blur_distorted.JPG')
 
-                #random_rotate = randint(-10, 10)
-                #rotate_image = image.rotate(random_rotate)
-                #width, height = rotate_image.size
-                #rotate_image_crop = ImageOps.crop(rotate_image, height / 8)
-                #rotate_image_crop.save(file_name[:-4]+ '_rotate_distorted.JPG', exif=exif)
-
-
-                # enhancer = ImageEnhance.Brightness(image)
-                # bright_image = enhancer.enhance(1.3)
-                # bright_image.save(file_name[:-4]+ '_brightness_distorted.JPG', exif=exif)
+                random_rotate = randint(-10, 10)
+                rotate_image = image.rotate(random_rotate)
+                width, height = rotate_image.size
+                rotate_image_crop = ImageOps.crop(rotate_image, height / 8)
+                rotate_image_crop.save(file_name[:-4]+ '_rotate_distorted.JPG', exif=exif)
 
 
-                #width, height = image.size
-                #crop_image_1 = image.crop((0, 0, width / 2, height / 2))
-                #crop_image_1.save(file_name[:-4] + '_crop_1_distorted.JPG', exif=exif)
+                enhancer = ImageEnhance.Brightness(image)
+                bright_image = enhancer.enhance(1.3)
+                bright_image.save(file_name[:-4]+ '_brightness_distorted.JPG', exif=exif)
 
-                #crop_image_2 = image.crop((width / 2, height / 2, width, height))
-                #crop_image_2.save(file_name[:-4] + '_crop_2_distorted.JPG', exif=exif)
+                width, height = image.size
+                crop_image_1 = image.crop((0, 0, width / 2, height / 2))
+                crop_image_1.save(file_name[:-4] + '_crop_1_distorted.JPG', exif=exif)
 
-                #crop_image_3 = image.crop((width / 2, 0, width, height / 2))
-                #crop_image_3.save(file_name[:-4] + '_crop_3_distorted.JPG', exif=exif)
-                #crop_image_4 = image.crop((0, height / 2, width / 2, height))
-                #crop_image_4.save(file_name[:-4] + '_crop_4_distorted.JPG', exif=exif)
+                crop_image_2 = image.crop((width / 2, height / 2, width, height))
+                crop_image_2.save(file_name[:-4] + '_crop_2_distorted.JPG', exif=exif)
+
+                crop_image_3 = image.crop((width / 2, 0, width, height / 2))
+                crop_image_3.save(file_name[:-4] + '_crop_3_distorted.JPG', exif=exif)
+                crop_image_4 = image.crop((0, height / 2, width / 2, height))
+                crop_image_4.save(file_name[:-4] + '_crop_4_distorted.JPG', exif=exif)
 
 
 def create_image_lists(image_dir):

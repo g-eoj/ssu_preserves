@@ -25,6 +25,8 @@ from tensorflow.python.util import compat
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_curve, auc
 from scipy import interp
+from PIL import Image
+from PIL import ImageOps
 import matplotlib.pyplot as plt
 from itertools import cycle
 import itertools
@@ -40,20 +42,20 @@ FLAGS = tf.app.flags.FLAGS
 # Input and output file flags.
 
 tf.app.flags.DEFINE_string('image_dir',
-                           './test_images _blah to throw this off. Use --image_dir in command line'
+                           './classify_test/'
                            , """Path to folder of test images.""")
-tf.app.flags.DEFINE_string('output_graph', './tmp/output_graph.pb',
+tf.app.flags.DEFINE_string('output_graph', './model_2/output_updated_timestamp_graph.pb',
                            """Where is the trained graph saved?""")
-tf.app.flags.DEFINE_string('output_labels', './tmp/output_labels.txt',
+tf.app.flags.DEFINE_string('output_labels', './model_2/output_updated_timestamp_labels.txt',
                            """Where are the labels for the trained graph?"""
                            )
 tf.app.flags.DEFINE_string('final_tensor_name', 'final_result',
                            'The name of the output classification layer in the trained graph.'
                            )
-tf.app.flags.DEFINE_string('summaries_dir', './tmp/testingLogs',
+tf.app.flags.DEFINE_string('summaries_dir', './model_2/testingLogs',
                            """Where to save summary logs for TensorBoard."""
                            )
-tf.app.flags.DEFINE_string('misclassified_dir', './misclassified_images',
+tf.app.flags.DEFINE_string('misclassified_dir', './misclassified_images_model_2',
                            """Where to save summary logs for TensorBoard."""
                            )                           
 
@@ -118,36 +120,56 @@ def create_graph(class_count):
 def create_image_list(image_dir):
     """Extracts images from the given directory
   """
-
     if not gfile.Exists(image_dir):
         print("Image directory '" + image_dir + "' not found.")
         return None
     result = []
+    sub_dirs = [x[0] for x in gfile.Walk(image_dir)]
+    # The root directory comes first, so skip it.
+    is_root_dir = False
+    for sub_dir in sub_dirs:
+        if is_root_dir:
+            is_root_dir = False
+            continue
+        extensions = ['jpg', 'jpeg', 'JPG', 'JPEG']
+        file_list = []
+        dir_name = os.path.basename(sub_dir)
+        if dir_name == image_dir:
+            continue
+        print("Looking for images in '" + dir_name + "'")
+        for extension in extensions:
+            file_glob = os.path.join(image_dir, '*.' + extension)
+            file_list.extend(gfile.Glob(file_glob))
+        if not file_list:
+            print('No files found')
+            continue
 
-    extensions = ['jpg', 'jpeg', 'JPG', 'JPEG']
-    file_list = []
-    dir_name = image_dir
-    print("Looking for images in '" + dir_name + "'")
-    for extension in extensions:
-        file_glob = os.path.join(image_dir, dir_name, '*.' + extension)
-        file_list.extend(glob.glob(file_glob))
-    if not file_list:
-        print('No files found')
-        return None
+        elif len(file_list) > MAX_NUM_IMAGES_PER_CLASS:
+            print('WARNING: Folder {} has more than {} images. Some images will '
+                  'never be selected.'.format(dir_name, MAX_NUM_IMAGES_PER_CLASS))
+        for file_name in file_list:
+            is_mirror_applied = "mirror" in file_name
+            is_blur_applied = "blur" in file_name
+            is_brightness_applied = "brightness" in file_name
+            is_rotation_applied = "rotate" in file_name
+            is_crop_applied = "crop" in file_name
+            # Distortions added below will NOT be added to folds
+            if is_crop_applied == False and is_brightness_applied == False and is_blur_applied == False and is_mirror_applied == False: #and is_rotation_applied ==False:
 
-    for file_name in file_list:
-        base_name = os.path.basename(file_name)
+                base_name = os.path.basename(file_name)
 
-    # We want to ignore anything after '_nohash_' in the file name when
-    # deciding which set to put an image in, the data set creator has a way of
-    # grouping photos that are close variations of each other. For example
-    # this is used in the plant disease data set to group multiple pictures of
-    # the same leaf.
+                # We want to ignore anything after '_nohash_' in the file name when
+                # deciding which set to put an image in, the data set creator has a way of
+                # grouping photos that are close variations of each other. For example
+                # this is used in the plant disease data set to group multiple pictures of
+                # the same leaf.
 
-        hash_name = re.sub(r'_nohash_.*$', '', file_name)
-        result.append(base_name)
+                hash_name = re.sub(r'_nohash_.*$', '', file_name)
+                result.append(base_name)
+
 
     return result
+
 
 
 def getClassNames():
@@ -180,6 +202,7 @@ def showClassifications():
 
 
 def get_image_and_ground_truth(class_names):
+
     full_image = []
     full_class = []
     simpleClassList = []
@@ -187,14 +210,28 @@ def get_image_and_ground_truth(class_names):
         imageClass = class_names[index]
         where = os.path.join(FLAGS.image_dir, imageClass)
         image_list = create_image_list(where)
-        for i in image_list:  # this stuff is no longer really necessary
-            full_image.append(os.path.join(where, i))
-            temp = np.zeros(len(class_names), dtype=np.float32)
-            temp[index] = 1.0
-            simpleClassList.append(index)
-            temp = np.transpose(temp)
-            full_class.append(temp)
+        is_first_run = True
+        for i, image in enumerate(image_list):  # this stuff is no longer really necessary
+            if not is_first_run:
+                prev_image = image_list[i-1]
+                if not prev_image[:13] == image[:13]:
+                    full_image.append(os.path.join(where, image))
+                    temp = np.zeros(len(class_names), dtype=np.float32)
+                    temp[index] = 1.0
+                    simpleClassList.append(index)
+                    temp = np.transpose(temp)
+                    full_class.append(temp)
+            else:
+                full_image.append(os.path.join(where, image))
+                temp = np.zeros(len(class_names), dtype=np.float32)
+                temp[index] = 1.0
+                simpleClassList.append(index)
+                temp = np.transpose(temp)
+                full_class.append(temp)
+                is_first_run = False
+
     return (full_image, full_class, simpleClassList)
+
 
 
 def getPredictions(result_tensor):
@@ -439,20 +476,48 @@ def withBottlenecks():
 
         prediction_list = []
         prediction_scores_list = []
-        for i in range(len(image_list)):
-            bottle = \
-                np.array(dictionary[os.path.basename(image_list[i])])
-
-            # print(bottle);
-
+        is_first_run = True
+        prediction_score = [[0,0,0,0,0,0,0,0]]
+        i = -1
+        l=1
+        for image in image_list:
+            i+=1
             if i % 50 == 0:
                 print('running image iteration ', i)
-            prediction = sess.run(getPredictions(final_tensor),
-                                  feed_dict={bottleneck_input: [bottle]})
-            prediction_score = sess.run(final_tensor,
-                                  feed_dict={bottleneck_input: [bottle]})
-            prediction_list.append(prediction)
-            prediction_scores_list.append(prediction_score)
+            bottle = np.array(dictionary[os.path.basename(image)])
+            if is_first_run:
+                prediction_score = sess.run(final_tensor,
+                                            feed_dict={bottleneck_input: [bottle]})
+                is_first_run = False
+            else:
+                prev_image = os.path.basename(image_list[i-1])
+
+                if prev_image[:13] == os.path.basename(image)[:13]:
+                    prediction_score += sess.run(final_tensor,
+                                            feed_dict={bottleneck_input: [bottle]})
+                    l+=1
+                else:
+                    prediction_score = prediction_score/l
+                    prediction = [np.argmax(prediction_score)]
+                    prediction_list.append(prediction)
+                    prediction_scores_list.append(prediction_score)
+                    prediction_score = sess.run(final_tensor,
+                                                feed_dict={bottleneck_input: [bottle]})
+                    l = 1
+
+
+        prediction_score = prediction_score / l
+        prediction = [np.argmax(prediction_score)]
+        prediction_list.append(prediction)
+        prediction_scores_list.append(prediction_score)
+
+
+
+        #print(prediction_scores_list)
+        #print(prediction_list)
+
+
+
         prediction_list = np.squeeze(prediction_list)
         print("gt", ground_truth)
         processResults(prediction_list, prediction_scores_list, ground_truth, simpleClassList, class_list)
@@ -463,16 +528,14 @@ def processResults(prediction_list, prediction_scores_list, truth, simpleClassLi
     plt.figure()
     (fpr, tpr, roc_auc) = getROC(truth, prediction_scores_list, class_list)
     multiClassROC(fpr, tpr, roc_auc, class_list)
-
-        # print ("predictions", prediction_list);
-        # print ("truth      ", truth);
+    print ("predictions", prediction_list);
+    print ("truth      ", truth);
 
     eq = np.equal(prediction_list, simpleClassList)
     results = np.mean(eq)
     conf_mat = confusion_matrix(simpleClassList, prediction_list) 
     print('results', results)
-    print('confusion matrix:')
-    print(conf_mat)
+
     plt.figure()
     plot_confusion_matrix(conf_mat, classes=class_list, normalize=False,
                           title='Confusion matrix')

@@ -108,7 +108,7 @@ FLAGS = None
 DATA_URL = 'http://download.tensorflow.org/models/image/imagenet/inception-2015-12-05.tgz'
 # pylint: enable=line-too-long
 BOTTLENECK_TENSOR_NAME = 'pool_3/_reshape:0'
-BOTTLENECK_TENSOR_SIZE = 1528
+BOTTLENECK_TENSOR_SIZE = 2048
 MODEL_INPUT_WIDTH = 299
 MODEL_INPUT_HEIGHT = 299
 MODEL_INPUT_DEPTH = 3
@@ -158,7 +158,7 @@ def create_image_lists(image_dir):
     # The root directory comes first, so skip it.
     is_root_dir = True
 
-    for sub_dir in sub_dirs:
+    for sub_dir in sub_dirs: #finds the classes within the training image directory
         if is_root_dir:
             is_root_dir = False
             continue
@@ -194,9 +194,9 @@ def create_image_lists(image_dir):
             is_rotation_applied = "rotate" in file_name
             is_crop_applied = "crop" in file_name
             #Distortions added below will NOT be added to folds
-            if is_crop_applied == False and is_brightness_applied == False and is_blur_applied == False and is_mirror_applied == False and is_rotation_applied == False:
+            if is_crop_applied == False and is_brightness_applied == False and is_blur_applied == False and is_mirror_applied == False:
 
-                with open(file_name, 'rb') as fh:  # get the capture date
+                with open(file_name, 'rb') as fh:  # get the images timestamp from exif data of image
                     tags = EXIF.process_file(fh, stop_tag="EXIF DateTimeOriginal")
                     dateTaken = tags["EXIF DateTimeOriginal"]
 
@@ -214,7 +214,7 @@ def create_image_lists(image_dir):
                         temp_list = []
                         temp_list.append(os.path.basename(file_name))
 
-                else:  # if first run just append image to temp list. Cannot find difference between first image and previous image since there was no previous image
+                else:  # if first run just append image to temp list. Cannot find difference in capture event between first image and previous image since there was no previous image
                     temp_list.append(os.path.basename(file_name))
 
                 old = datetime.strptime(str(dateTaken), "%Y:%m:%d %H:%M:%S")  # Set current image timestamp to old
@@ -229,12 +229,13 @@ def create_image_lists(image_dir):
             list_image_groups.append(temp_list)
             temp_list = []'''
 
-        # Shuffle the list of image groups to make each run random
+        # Shuffle the list of image groups so that the same images don't always end up in the same folds
+        # This makes each run random
         random.shuffle(list_image_groups)
 
         # Creates a dictionary with k number of folds which will store what image groups are within each fold
         fold_dict = {}
-        y = 1
+        y = 1 #iterator
         while y <= folds:
             fold_dict[y] = []  # create blank list for each fold
             y += 1
@@ -247,13 +248,13 @@ def create_image_lists(image_dir):
             fold_dict_all[smallest].extend(value)
 
         # Prints out number of images per fold
-        p = 1
+        p = 1 #iterator
         while p <= folds:
             print("Fold " + str(p) + ":", len(fold_dict[p]))
             p += 1
 
         # Creates result_list: a list containing k dictionaries each differing in which fold is the test set
-        t = 1
+        t = 1 #iterator
         for x in result_list:  # Get one dictionary at a time
             training_folds = []
             for i in fold_dict.keys():
@@ -267,7 +268,7 @@ def create_image_lists(image_dir):
             t += 1
 
     # Creates text files detailing images in each fold
-    m = 1
+    m = 1 #iterator
     while m <= len(fold_dict):
         save_path = '/Users/snadendla/software/ssu_preserves/tmp/fold_contents'
         name_of_file = 'fold' + str(m) + '_set.txt'
@@ -920,11 +921,11 @@ def add_confusion_matrix_step(result_tensor, ground_truth_input):
 
 
 def plot_confusion_matrix(
-    cm,
-    classes = ['bobcat', 'deer', 'human', 'nothing', 'possum', 'skunk', 'squirrel', 'turkey'],
-    normalize=False,
+    cm, #the confusion matrix
+    classes = ['bobcat', 'deer', 'human', 'nothing', 'possum', 'skunk', 'squirrel', 'turkey'], #names of classes. change these to the classes you have in your dataset
+    normalize=False, #whether to normalize the confusion matrix or not
     title='Confusion matrix',
-    cmap=plt.cm.Blues,
+    cmap=plt.cm.Blues, #color of matrix
     ):
     """
     This function prints and plots the confusion matrix.
@@ -944,7 +945,7 @@ def plot_confusion_matrix(
     else:
         print('Confusion matrix, without normalization')
 
-    print(cm)
+    print(cm) #print the confusion matrix (text based) to terminal
 
     thresh = cm.max() / 2.
     for (i, j) in itertools.product(range(cm.shape[0]),
@@ -984,6 +985,7 @@ def main(_):
             create_inception_graph())
 
         # See if the command-line flags mean we're applying any distortions.
+        #These distortions are random and no bottlenecks will be created
         do_distort_images = should_distort_images(
             FLAGS.flip_left_right, FLAGS.random_crop, FLAGS.random_scale,
             FLAGS.random_brightness)
@@ -1044,7 +1046,7 @@ def main(_):
                 # Learning rate calculation
                 max_learning_rate = 0.001
                 min_learning_rate = 0.0001
-                decay_speed = 2000.0  # 0.003-0.0001-2000=>0.9826 done in 5000 iterations
+                decay_speed = 2000.0  # 0.001-0.0001-2000=>0.9826 done in 5000 iterations
                 learning_rate_decayed = min_learning_rate + (max_learning_rate - min_learning_rate) * math.exp(
                     -i / decay_speed)
                 # Feed the bottlenecks and ground truth into the graph, and run a training
@@ -1104,13 +1106,12 @@ def main(_):
     plot_confusion_matrix(confusion_all)  # Plot and print confusion matrix using matplotlib
 
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--image_dir',
         type=str,
-        default='./training_images/',
+        default='./training_images_all_distortions/',
         help='Path to folders of labeled images.'
     )
     parser.add_argument(
@@ -1146,13 +1147,13 @@ if __name__ == '__main__':
     parser.add_argument(
         '--how_many_training_steps',
         type=int,
-        default=100,
+        default=4000,
         help='How many training steps to run before ending.'
     )
     parser.add_argument(
         '--how_many_folds',
         type=int,
-        default=5,
+        default=10,
         help='How many folds to use in k-fold validation'
     )
     parser.add_argument(

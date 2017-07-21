@@ -175,24 +175,30 @@ def create_image_lists(image_dir, testing_percentage, validation_percentage):
         dict_key = 0
         temp_list= []
         for file_name in file_list:
-
-            with open(file_name , 'rb') as fh:
-                    tags = EXIF.process_file(fh, stop_tag="EXIF DateTimeOriginal")
-                    dateTaken = tags["EXIF DateTimeOriginal"]
-            new = datetime.strptime(str(dateTaken), "%Y:%m:%d %H:%M:%S")
-            if not_first_run:
-                difference = abs(new-old)
-                if difference.seconds <= time_stamp_difference:
-                    temp_list.append(os.path.basename(file_name))
+            is_mirror_applied = "mirror" in file_name
+            is_blur_applied = "blur" in file_name
+            is_brightness_applied = "brightness" in file_name
+            is_rotation_applied = "rotate" in file_name
+            is_crop_applied = "crop" in file_name
+            # Distortions added below will NOT be added to folds
+            if is_crop_applied == False and is_brightness_applied == False and is_blur_applied == False and is_mirror_applied == False: #and is_rotation_applied == False:
+                with open(file_name , 'rb') as fh:
+                        tags = EXIF.process_file(fh, stop_tag="EXIF DateTimeOriginal")
+                        dateTaken = tags["EXIF DateTimeOriginal"]
+                new = datetime.strptime(str(dateTaken), "%Y:%m:%d %H:%M:%S")
+                if not_first_run:
+                    difference = abs(new-old)
+                    if difference.seconds <= time_stamp_difference:
+                        temp_list.append(os.path.basename(file_name))
+                    else:
+                        dict_image_groups[dict_key] = temp_list
+                        dict_key += 1
+                        temp_list = []
+                        temp_list.append(os.path.basename(file_name))
                 else:
-                    dict_image_groups[dict_key] = temp_list
-                    dict_key += 1
-                    temp_list = []
                     temp_list.append(os.path.basename(file_name))
-            else:
-                temp_list.append(os.path.basename(file_name))
-            old = datetime.strptime(str(dateTaken), "%Y:%m:%d %H:%M:%S")
-            not_first_run= True
+                old = datetime.strptime(str(dateTaken), "%Y:%m:%d %H:%M:%S")
+                not_first_run= True
 
         #Booleans to verify that at least one image group was added to the image sets
         a = False
@@ -1105,13 +1111,13 @@ if __name__ == '__main__':
     parser.add_argument(
         '--output_graph',
         type=str,
-        default='./tmp/output_updated_timestamp_graph.pb',
+        default='./model_2/output_updated_timestamp_graph.pb',
         help='Where to save the trained graph.'
     )
     parser.add_argument(
         '--intermediate_output_graphs_dir',
         type=str,
-        default='./tmp/intermediate_updated_timestamp_graph/',
+        default='./model_2/intermediate_updated_timestamp_graph/',
         help='Where to save the intermediate graphs.'
     )
     parser.add_argument(
@@ -1123,13 +1129,13 @@ if __name__ == '__main__':
     parser.add_argument(
         '--output_labels',
         type=str,
-        default='./tmp/output_updated_timestamp_labels.txt',
+        default='./model_2/output_updated_timestamp_labels.txt',
         help='Where to save the trained graph\'s labels.'
     )
     parser.add_argument(
         '--summaries_dir',
         type=str,
-        default='./tmp/retrain_updated_timestamp_logs',
+        default='./model_2/retrain_updated_timestamp_logs',
         help='Where to save summary logs for TensorBoard.'
     )
     parser.add_argument(
