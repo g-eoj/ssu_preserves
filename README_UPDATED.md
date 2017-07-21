@@ -6,8 +6,8 @@ The following improvements were made to retrain.py in order to further validate 
 
 ### retrain_updated.py
 
-retrain.py was updated to tensorflow 1.2
-Exponentially decaying learning rate was implemented.
+retrain.py was updated to tensorflow 1.2.
+An exponentially decaying learning rate has been implemented.
 
 ### retrain_updated_time_stamp.py
 
@@ -24,7 +24,8 @@ The model now uses k-fold validation. The number of folds can be set to an arbit
 parameter: '--how_many_folds'.
 The confusion matrix is now plotted using matplotlib
 A text file for each fold is generated showing the images within that fold. The images are not always placed 
-into the same fold. This can be changed by removing the line:                  random.shuffle(list_image_groups). 
+into the same fold. This can be changed by removing the line:
+    random.shuffle(list_image_groups). 
 The text files are stored within the tmp folder under fold_contents.
 
 
