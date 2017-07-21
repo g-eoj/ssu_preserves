@@ -1,5 +1,17 @@
 # SHIP 2017 Project 
 
+### Updates to classify.py
+
+classify.py now given an image will apply distortions to it and will make a prediction based on the average
+confidence of the distorted and original images.
+
+### Updates to classify_directory.py
+
+classify_directory.py now given an image and its distortions generated using 
+retrain_updated_image_augmentation.py will treat distorted images as versions of the original.
+The confidence score it has for the original and the distortions are averaged and the average is used to 
+determine the model's prediction
+
 ### Updates to retrain.py
 
 The following improvements were made to retrain.py in order to further validate the model's performance
@@ -40,3 +52,5 @@ create_image_lists which currently prevents all distorted images from being incl
 
 The current model was replaced with a different frozen version of Inception v3. The implementation is not yet 
 complete and the model does not create bottlenecks
+
+
