@@ -24,7 +24,7 @@ The model now uses k-fold validation. The number of folds can be set to an arbit
 parameter: '--how_many_folds'.
 The confusion matrix is now plotted using matplotlib
 A text file for each fold is generated showing the images within that fold. The images are not always placed 
-into the same fold. This can be changed by removing the line:                  random.shuffle(list_image_groups)
+into the same fold. This can be changed by removing the line:                  random.shuffle(list_image_groups). 
 The text files are stored within the tmp folder under fold_contents.
 
 
@@ -32,7 +32,7 @@ The text files are stored within the tmp folder under fold_contents.
 
 This model with k-fold validation will non-randomly augment images if the hyper-parameter: '--augment_images' 
 is set to True. Run the augmentation once as it will create all the distorted images and bottlenecks. On 
-subsequent runs choose the distorted images you want to include by editing the if statement in 
+subsequent runs set '--augment_images' to False and choose the distorted images you want to include by editing the if statement in 
 create_image_lists which currently prevents all distorted images from being included in the folds.
 
 ### retrain_updated_model_v3.py
