@@ -38,5 +38,5 @@ create_image_lists which currently prevents all distorted images from being incl
 
 ### retrain_updated_model_v3.py
 
-The current model was replaced by a different frozen version of Inception v3. The implementation is not yet 
+The current model was replaced with a different frozen version of Inception v3. The implementation is not yet 
 complete and the model does not create bottlenecks
