@@ -9,8 +9,8 @@ confidence of the distorted and original images.
 
 classify_directory.py now given an image and its distortions generated using 
 retrain_updated_image_augmentation.py will treat distorted images as versions of the original.
-The confidence score it has for the original and the distortions are averaged and the average is used to 
-determine the model's prediction
+The confidence score it has for the original and the distortions will be averaged; this average confidence 
+score is used to calculate the model's prediction
 
 ### Updates to retrain.py
 
