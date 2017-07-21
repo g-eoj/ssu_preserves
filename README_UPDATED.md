@@ -4,12 +4,12 @@
 
 The following improvements were made to classify.py in order to further validate the model's performance
 
-#### Updates to classify.py
+#### classify.py
 
 classify.py now given an image will apply distortions to it and will make a prediction based on the average
 confidence of the distorted and original images.
 
-#### Updates to classify_directory.py
+#### classify_directory.py
 
 classify_directory.py now given an image and its distortions generated using 
 retrain_updated_image_augmentation.py will treat distorted images as versions of the original.
