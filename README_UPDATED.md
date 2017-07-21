@@ -1,5 +1,9 @@
 # SHIP 2017 Project 
 
+## Updates to Classify
+
+The following improvements were made to classify.py in order to further validate the model's performance
+
 ### Updates to classify.py
 
 classify.py now given an image will apply distortions to it and will make a prediction based on the average
@@ -12,7 +16,7 @@ retrain_updated_image_augmentation.py will treat distorted images as versions of
 The confidence score it has for the original and the distortions will be averaged; this average confidence 
 score is used to calculate the model's prediction
 
-### Updates to retrain.py
+## Updates to Retrain
 
 The following improvements were made to retrain.py in order to further validate the model's performance
 
