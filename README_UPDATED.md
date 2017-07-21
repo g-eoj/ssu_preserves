@@ -2,7 +2,7 @@
 
 ## Updates to Classify
 
-The following improvements were made to classify.py in order test the model's performance
+The following improvements were made to classify.py and classify_directory.py in order test the model's performance
 
 #### classify.py
 
