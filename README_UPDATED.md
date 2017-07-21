@@ -7,7 +7,7 @@ The following improvements were made to classify.py in order to further validate
 #### classify.py
 
 classify.py now given an image will apply distortions to it and will make a prediction based on the average
-confidence of the distorted and original images.
+confidence of the distorted and original image.
 
 #### classify_directory.py
 
